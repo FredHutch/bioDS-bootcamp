@@ -1,0 +1,13 @@
+molecular_id,assay_material_id,genomics_types,omics_sample_name,omics_contact_id,omics_date,seq_pool,seq_platelocation,seq_totalinput,seq_flowcell_id,seq_readlength,seq_paired,seq_libtype,genomics_note
+M00000812,R0631,dnaseq,JAK2-1-1,jradich,3/13/15,ADWAR,G11,50,160830_ADWAR,150,yes,tsm,
+M00000813,R0632,dnaseq,JAK2-6-1,jradich,3/13/15,ADWAR,F11,50,160830_ADWAR,150,yes,tsm,
+M00000814,R0633,dnaseq,JAK2-7-1,jradich,3/9/15,ADV75-ADW8F,C12,50,160829_ADV75-ADW8F,150,yes,tsm,ADV75: 15-03-09;ADW8F: 15-03-11
+M00000815,R0634,dnaseq,JAK2-10-1,jradich,3/9/15,ADV75-ADW8F,A12,50,160829_ADV75-ADW8F,150,yes,tsm,ADV75: 15-03-09;ADW8F: 15-03-11
+M00000816,R0635,dnaseq,JAK2-29,jradich,3/9/15,ADV75-ADW8F,D12,50,160829_ADV75-ADW8F,150,yes,tsm,ADV75: 15-03-09;ADW8F: 15-03-11
+M00000817,R0636,dnaseq,JAK2-30,jradich,3/13/15,ADWAR,H12,50,160830_ADWAR,150,yes,tsm,
+M00000818,R0637,dnaseq,JAK2-31,jradich,3/13/15,ADWAR,H11,50,160830_ADWAR,150,yes,tsm,
+M00000819,R0638,dnaseq,JAK2-36,jradich,3/13/15,ADWAR,E11,50,160830_ADWAR,150,yes,tsm,
+M00000820,R0639,dnaseq,JAK2-37,jradich,3/9/15,ADV75-ADW8F,B12,50,160829_ADV75-ADW8F,150,yes,tsm,ADV75: 15-03-09;ADW8F: 15-03-11
+M00000821,R0640,dnaseq,JAK2-39,jradich,3/13/15,ADWAR,E12,50,160830_ADWAR,150,yes,tsm,
+M00000822,R0641,dnaseq,JAK2-40,jradich,3/13/15,ADWAR,F12,50,160830_ADWAR,150,yes,tsm,
+M00000823,R0642,dnaseq,JAK2-43,jradich,3/13/15,ADWAR,G12,50,160830_ADWAR,150,yes,tsm,

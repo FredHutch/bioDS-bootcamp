@@ -1,0 +1,13 @@
+﻿assay_material_id,sex,race,age_range,diagnosis,collection_event,acquisition_date,tissue_type,collection_type,processing_type,time_to_processing,storage,shipping,genotype_jak2,genotype_calr,genotype_mpl,material_type,extraction_type,na_260280,na_260230,jak2_vaf
+R0631,male,unknown,adult18to60,mf,diagnosis,7/22/13,peripheralblood,edta,mononuclearcells,repositoryprocessing,cryopreserved,fresh,positive,negative,notdetermined,DNA,column,,,91.8
+R0632,unknown,unknown,unknown,mf,diagnosis,8/14/13,peripheralblood,edta,mononuclearcells,repositoryprocessing,cryopreserved,fresh,positive,negative,notdetermined,DNA,column,,,70
+R0633,unknown,unknown,unknown,mf,diagnosis,8/19/13,peripheralblood,edta,mononuclearcells,repositoryprocessing,cryopreserved,fresh,negative,positive,notdetermined,DNA,column,,,0
+R0634,male,unknown,elderly61,mf,diagnosis,8/22/13,peripheralblood,edta,mononuclearcells,repositoryprocessing,cryopreserved,fresh,negative,positive,notdetermined,DNA,column,,,0
+R0635,unknown,unknown,unknown,mf,diagnosis,3/22/13,peripheralblood,unknown,mononuclearcells,repositoryprocessing,cryopreserved,fresh,negative,negative,notdetermined,DNA,column,,,0
+R0636,unknown,unknown,unknown,mf,diagnosis,4/17/13,peripheralblood,unknown,mononuclearcells,repositoryprocessing,cryopreserved,fresh,positive,negative,notdetermined,DNA,column,,,93.4
+R0637,unknown,unknown,unknown,mf,diagnosis,5/17/13,peripheralblood,unknown,mononuclearcells,repositoryprocessing,cryopreserved,fresh,positive,negative,notdetermined,DNA,column,,,95.5
+R0638,unknown,unknown,unknown,mf,diagnosis,6/14/13,peripheralblood,unknown,mononuclearcells,repositoryprocessing,cryopreserved,fresh,positive,negative,notdetermined,DNA,column,,,46.2
+R0639,unknown,unknown,unknown,mf,diagnosis,6/20/13,peripheralblood,unknown,mononuclearcells,repositoryprocessing,cryopreserved,fresh,negative,positive,notdetermined,DNA,column,,,0
+R0640,unknown,unknown,unknown,mf,diagnosis,6/28/13,peripheralblood,unknown,mononuclearcells,repositoryprocessing,cryopreserved,fresh,negative,positive,notdetermined,DNA,column,,,0
+R0641,unknown,unknown,unknown,mf,diagnosis,7/2/13,peripheralblood,unknown,mononuclearcells,repositoryprocessing,cryopreserved,fresh,negative,positive,notdetermined,DNA,column,,,0
+R0642,unknown,unknown,unknown,mf,diagnosis,7/9/13,peripheralblood,unknown,mononuclearcells,repositoryprocessing,cryopreserved,fresh,negative,positive,notdetermined,DNA,column,,,0
