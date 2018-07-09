@@ -1,0 +1,5 @@
+__no_feature	6780193
+__ambiguous	658518
+__too_low_aQual	1105975
+__not_aligned	1182666
+__alignment_not_unique	4860484
