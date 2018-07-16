@@ -1,0 +1,45 @@
+---
+title: "RNASeqProj"
+author: "Gavin Fortenberry"
+date: "July 16, 2018"
+output: html_document
+---
+```{r}
+install.packages("dplyr")
+#install.packages("questionr")
+```
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## R Markdown
+## Reads the two CSV's and combines them into one data frame:
+```{r}
+
+list.files("../RNASeqData")
+df_pheno <- read.csv(file="../RNASeqData/phenotypeTable.csv", header =TRUE, sep=",")
+df_molecular <- read.csv(file="../RNASeqData/molecularDataSets.csv", header =TRUE, sep=",")
+#df_pheno
+#df_molecular
+df_pheno <- dplyr::rename(df_pheno, assay_material_id = `ï..assay_material_id`)
+#str(df_pheno)
+#str
+df_combined <- dplyr::full_join(df_pheno, df_molecular, by = "assay_material_id")
+df_combined
+```
+
+## Writes a CSV from the new combined data frame:
+```{r}
+write.csv(df_combined, file = "../ProjectFiles/combineddata.csv", row.names = FALSE)
+```
+
+##Reads in the commbined data set/tests structure
+```{r}
+test_set_combined_data <- read.csv("combineddata.csv")
+str(test_set_combined_data)
+summary(test_set_combined_data)
+```
+
+##Make list of directories(folder) 
+
