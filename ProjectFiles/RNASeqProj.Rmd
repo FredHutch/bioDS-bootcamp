@@ -41,5 +41,38 @@ str(test_set_combined_data)
 summary(test_set_combined_data)
 ```
 
-##Make list of directories(folder) 
+##Make list of directories(folders) 
+```{r}
+#":/Users/gfortenb/Documents/GitHub/bioDS-bootcamp/RNASeqData"
+RNADirectoryList = list.dirs( path = "C:/Users/gfortenb/Documents/GitHub/bioDS-bootcamp/RNASeqData", 
+                              
+                              recursive = FALSE)
+
+```
+##Make List of files within each folder
+```{r}
+RNADirectoryList
+FileList1 = sapply(RNADirectoryList, 
+                   function(x){list.files(path = x, 
+                                          full.names = TRUE, 
+                                          pattern = "htseq.txt") }) #makes a list of files with that string in the name
+FileIDList <- as.data.frame(cbind(FileList1, gsub("^.*-","", RNADirectoryList)), stringsAsFactors = F)
+colnames(FileIDList) <- c("Path", "molecular_id")
+FileList1
+```
+##Read in data from selected list and compile into data frame
+
+```{r}
+listOf_all_df <- lapply(seq(1:nrow(FileIDList)),
+                 function(i){ 
+                   X <-read.delim(file = FileIDList$Path[i],
+                                         header = FALSE);
+                   colnames(X) <- c("Gene", FileIDList$molecular_id[i]);
+                   return(X)
+                   } )
+
+listOf_all_df
+#make list of dataframes into one dataframe w/all contents of each dataframe in the list of dataframes as columns
+
+```
 
