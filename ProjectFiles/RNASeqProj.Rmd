@@ -5,7 +5,8 @@ date: "July 16, 2018"
 output: html_document
 ---
 ```{r}
-install.packages("dplyr")
+#install.packages("dplyr")
+library(plyr); library(dplyr)
 #install.packages("questionr")
 ```
 
@@ -63,7 +64,7 @@ FileList1
 ##Read in data from selected list and compile into data frame
 
 ```{r}
-listOf_all_df <- lapply(seq(1:nrow(FileIDList)),
+listOf_alldf <- lapply(seq(1:nrow(FileIDList)),
                  function(i){ 
                    X <-read.delim(file = FileIDList$Path[i],
                                          header = FALSE);
@@ -71,8 +72,13 @@ listOf_all_df <- lapply(seq(1:nrow(FileIDList)),
                    return(X)
                    } )
 
-listOf_all_df
-#make list of dataframes into one dataframe w/all contents of each dataframe in the list of dataframes as columns
-
+listOf_alldf
 ```
+##Make list of dataframes into one dataframe w/all contents of each dataframe in the list of dataframes as columns
+##This produces a dataframe with the molecular ID and Genes in each sample assigned to a molecular ID
+```{r}
+all_joined_df <- plyr:: join_all(listOf_alldf, by = NULL, type = "full", match = "all")
+all_joined_df
+```
+
 
