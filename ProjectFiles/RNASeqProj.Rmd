@@ -1,27 +1,30 @@
 ---
-title: "RNASeqProj"
+title: "RNA Sequencing Differential Analysis Project"
 author: "Gavin Fortenberry"
 date: "July 16, 2018"
 output:
   html_document:
-    df_print: paged
-  pdf_document: default
+    toc: true
+    toc_float: true
 ---
+# Introduction
+
+# Data Import
+## Install R Packages
 Installs packages of functions that can be used to help manipulate variables and data libraries. These packages can be installed through base R code that downloads them and installs them into R studio. Then certain programming phrases can be used to do new functions in connection with base R programming phrases, with an indicator of the package being used mentioned before using that package's functions. For example, if I wanted to use a function of the "dplyr" package, I would write -> "dplyr::(insert function here)(insert arguments of functions here)". Note that functions or phrases that are in base R programming vocabulary do not require a name indicator of the package being used, as it is from the base software and the software knows how to interperet those phrases without an idicator of a package. It is still required to write names of functions from Base R that are wanting to be used though, and if shortcut variables for functions are desired then you can assign new variables to those functions.
-```{r Install Packages, eval=FALSE, include=FALSE}
+```{r Install Packages, eval=FALSE, message=FALSE, warning=FALSE, include=FALSE}
 install.packages("dplyr")
 install.packages("knitr")
 install.packages("rmarkdown")
 install.packages("utils")
 ```
+## Load Libraries
 
 ```{r Load Libraries, message=FALSE, warning=FALSE, include=FALSE, paged.print=FALSE}
-
 library(plyr); library(dplyr)
-library(utils)
 ```
 
- R Markdown
+## Read in Project Metadata to R
 Reads the two CSV's and combines them into one data frame:
 The code below creates three data frames: one labeled as "df_pheno" for data of a  file called phenotable, which contains demographics and general information from patients and samples taken from them, another labeled as "df_molecular" for data from another file called molecularDataSets, which contains more specific info on samples collected from patients and their diagnoses from these samples, and another labeled as "df_combined" that combines the two data frames according to common columns.
 
@@ -36,34 +39,38 @@ The function used to actually combine the two dataframes into one is the "full_j
 "str()" is short for structure, and is a base R function that allows the user to get an idea of the format of the data they are looking at
 ```{r First Data Frame Creations/Combine, echo=TRUE, warning=FALSE}
 
-df_pheno <- read.csv(file="../RNASeqData/phenotypeTable.csv", header =TRUE, sep=",")
-df_pheno <- dplyr::rename(df_pheno, assay_material_id = `ï..assay_material_id`)
-#str(df_pheno)
-df_molecular <- read.csv(file="../RNASeqData/molecularDataSets.csv", header =TRUE, sep=",")
-#df_molecular
-#str(df_molecular)
-df_combined <- dplyr::full_join(df_pheno, df_molecular, by = "assay_material_id")
-utils:: head(df_combined, n = 3)
-#str(df_combined)
+df_pheno <- read.csv(file="../RNASeqData/phenotypeTable.csv", 
+                     header =TRUE, sep=",")
+#df_pheno <- dplyr::rename(df_pheno, assay_material_id = `?..assay_material_id`)
+
+df_molecular <- read.csv(file="../RNASeqData/molecularDataSets.csv", 
+                         header =TRUE, sep=",")
+
+df_combined <- dplyr::full_join(df_pheno, df_molecular, 
+                                by = "assay_material_id")
+head(df_combined, n = 3)
+
 ```
+
+## Save Prepared Metadata
 Writes a CSV (a comma seperated values document) from the new combined data frame(df_combined) of dataframes df_pheno and df_molecular into a document called "combineddata.csv" stored in the working directory (the main location of the files created from the Rstudio
-```{r Write First CSV, echo=TRUE}
-write.csv(df_combined, file = "../ProjectFiles/combineddata.csv", row.names = FALSE)
+```{r Write First CSV, eval=FALSE, include=TRUE}
+write.csv(df_combined, file = "../ProjectFiles/combineddata.csv", 
+          row.names = FALSE)
 ```
 
 The read.csv function is used to re-read the newly written CSV to make sure the data is the same as it was when written. The "str()" and "summary" functions are used to compare the statistics of the new dataframe to the original created one to confirm similarity.
 ```{r Test Output of newly written CSV, eval=FALSE, include=FALSE}
 test_set_combined_data <- read.csv("combineddata.csv")
 str(test_set_combined_data)
-summary(test_set_combined_data)
 ```
 
+## Read in RNA Sequencing Data from HiSat2/htseqcount
 Makes a list of directories(folders) with the R base function "list.dirs" which takes the indicated path of the main directory containing the directories its making a list of in, and the econd argument written "recursive" is set to false becuse the main directory is not desired to be listed in the list of its components.
+
 ```{r Creation of List of Directories}
 #":/Users/gfortenb/Documents/GitHub/bioDS-bootcamp/RNASeqData"
-RNADirectoryList = list.dirs( path = "C:/Users/gfortenb/Documents/GitHub/bioDS-bootcamp/RNASeqData", 
-                              
-                              recursive = FALSE)
+RNADirectoryList = list.dirs(path = "../RNASeqData", recursive = FALSE)
 
 ```
 
@@ -74,12 +81,14 @@ Binds path's of files(locations of the files in the computer) on the list made t
 The "colnames" function (base R) sets the column names if the newly created dataframe.
 
 ```{r List of htseq files & Path/ID Dataframe, echo=TRUE}
-RNADirectoryList
 FileList1 = sapply(RNADirectoryList, 
                    function(x){list.files(path = x, 
                                           full.names = TRUE, 
-                                          pattern = "htseq.txt") }) #makes a list of files with that string in the name
-FileIDList <- as.data.frame(cbind(FileList1, gsub("^.*-","", RNADirectoryList)), stringsAsFactors = F)
+                                          pattern = "htseq.txt") }) 
+
+FileIDList <- as.data.frame(cbind(FileList1, 
+                                  gsub("^.*-","", RNADirectoryList)), 
+                            stringsAsFactors = F)
 colnames(FileIDList) <- c("Path", "molecular_id")
 head(FileIDList, n = 3)
 ```
@@ -88,19 +97,39 @@ Reads all data from list of selected files and compiles into different data fram
 ```{r Creates List of all Dataframes}
 listOf_alldf <- lapply(seq(1:nrow(FileIDList)),
                  function(i){ 
-                   X <-read.delim(file = FileIDList$Path[i],
+                   X <- read.delim(file = FileIDList$Path[i],
                                          header = FALSE);
                    colnames(X) <- c("Gene", FileIDList$molecular_id[i]);
                    return(X)
                    } )
-
-listOf_alldf
 ```
+
+# Prepare RNA Sequencing Data for Analysis
 Make the list of dataframes into one dataframe w/all contents of each dataframe in the dataframe of dataframes as columns using the "join_all" function from the plyr package.
 This produces a dataframe with the molecular ID and Genes in each sample assigned to a molecular ID columns.
-```{r}
-all_joined_df <- plyr:: join_all(listOf_alldf, by = NULL, type = "full", match = "all")
-all_joined_df
+```{r Join All Data, message=FALSE, warning=FALSE}
+all_joined_df <- plyr:: join_all(listOf_alldf, by = NULL, 
+                                 type = "full", match = "all")
+head(all_joined_df, n = 3)
 ```
+
+## Create a Summarized Experiment Data set
+
+## Normalize RNA Sequencing Counts
+
+# Differential Gene Expression Analysis with DESeq2
+
+## Install Bioconductor, the DESeq2 Package and ggplot2
+
+```{r Install Additional Packages, eval=FALSE, echo=TRUE, message=FALSE, warning=FALSE}
+source("https://bioconductor.org/biocLite.R")
+biocLite("DESeq2")
+install.packages("ggplot2")
+```
+## Load Additional Packages
+```{r Load Additional Libraries, echo=TRUE, message=FALSE, warning=FALSE}
+library(DESeq2); library(ggplot2)
+```
+
 
 
