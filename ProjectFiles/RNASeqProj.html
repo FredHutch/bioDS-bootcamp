@@ -248,8 +248,8 @@ div.tocify {
 <p>The function used to actually combine the two dataframes into one is the “full_join” function from the dplyr package which joins two indicated dataframes together by a common column.</p>
 <p>“str()” is short for structure, and is a base R function that allows the user to get an idea of the format of the data they are looking at</p>
 <pre class="r"><code>df_pheno &lt;- read.csv(file=&quot;../RNASeqData/phenotypeTable.csv&quot;, 
-                     header =TRUE, sep=&quot;,&quot;)
-#df_pheno &lt;- dplyr::rename(df_pheno, assay_material_id = `?..assay_material_id`)
+                     header =TRUE)
+df_pheno &lt;-df_pheno %&gt;% rename( assay_material_id = ends_with(&quot;assay_material_id&quot;))
 
 df_molecular &lt;- read.csv(file=&quot;../RNASeqData/molecularDataSets.csv&quot;, 
                          header =TRUE, sep=&quot;,&quot;)
@@ -362,13 +362,9 @@ head(all_joined_df, n = 3)</code></pre>
 <h1>Differential Gene Expression Analysis with DESeq2</h1>
 <div id="install-bioconductor-the-deseq2-package-and-ggplot2" class="section level2">
 <h2>Install Bioconductor, the DESeq2 Package and ggplot2</h2>
-<pre class="r"><code>source(&quot;https://bioconductor.org/biocLite.R&quot;)
-biocLite(&quot;DESeq2&quot;)
-install.packages(&quot;ggplot2&quot;)</code></pre>
 </div>
 <div id="load-additional-packages" class="section level2">
 <h2>Load Additional Packages</h2>
-<pre class="r"><code>library(DESeq2); library(ggplot2)</code></pre>
 </div>
 </div>
 

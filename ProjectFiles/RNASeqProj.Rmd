@@ -40,8 +40,8 @@ The function used to actually combine the two dataframes into one is the "full_j
 ```{r First Data Frame Creations/Combine, echo=TRUE, warning=FALSE}
 
 df_pheno <- read.csv(file="../RNASeqData/phenotypeTable.csv", 
-                     header =TRUE, sep=",")
-#df_pheno <- dplyr::rename(df_pheno, assay_material_id = `?..assay_material_id`)
+                     header =TRUE)
+df_pheno <-df_pheno %>% rename( assay_material_id = ends_with("assay_material_id"))
 
 df_molecular <- read.csv(file="../RNASeqData/molecularDataSets.csv", 
                          header =TRUE, sep=",")
@@ -121,13 +121,13 @@ head(all_joined_df, n = 3)
 
 ## Install Bioconductor, the DESeq2 Package and ggplot2
 
-```{r Install Additional Packages, eval=FALSE, echo=TRUE, message=FALSE, warning=FALSE}
+```{r Install Additional Packages, eval=FALSE, message=FALSE, warning=FALSE, include=FALSE}
 source("https://bioconductor.org/biocLite.R")
 biocLite("DESeq2")
 install.packages("ggplot2")
 ```
 ## Load Additional Packages
-```{r Load Additional Libraries, echo=TRUE, message=FALSE, warning=FALSE}
+```{r Load Additional Libraries, eval=FALSE, message=FALSE, warning=FALSE, include=FALSE}
 library(DESeq2); library(ggplot2)
 ```
 
