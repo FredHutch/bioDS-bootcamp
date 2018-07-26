@@ -229,13 +229,48 @@ div.tocify {
 
 <div id="introduction" class="section level1">
 <h1>Introduction</h1>
-<p>Myleofibrosis is a type of bone marrow cancer in which an rapidly increasing number of blood forming cells form a fibrous like structure that sometimes leads to acute leukemia. Certain genotypes like the JAK2 V617F mutation have been a determining factor of Blast Transformation in Myleofibrosis. - What is differential gene expression? Differential gene expression is a way to analyze factors in different groups that may or may not be associated with different gene counts, from RNA sequence data.</p>
+<div id="what-is-myleofibrosis" class="section level3">
+<h3>What is Myleofibrosis?</h3>
+<ul>
+<li>Myleofibrosis is a type of bone marrow cancer in which an rapidly increasing number of blood forming cells form a fibrous like structure that sometimes leads to acute leukemia. Certain genotypes like the JAK2 V617F mutation have been a determining factor of Blast Transformation in Myleofibrosis.</li>
+</ul>
+</div>
+<div id="what-is-differential-gene-expression" class="section level2">
+<h2>What is differential gene expression?</h2>
+<ul>
+<li>Differential gene expression is a way to analyze factors in different groups that may or may not be associated with different gene counts, from RNA sequence data.</li>
+</ul>
+<div id="what-is-gene-expression" class="section level3">
+<h3>What is gene expression?</h3>
+</div>
+<div id="why-is-differential-gene-expression-important-to-a-biological-question" class="section level3">
+<h3>Why is differential gene expression important to a biological question?</h3>
+</div>
+</div>
+<div id="how-to-do-differential-gene-expression" class="section level2">
+<h2>How to do differential gene expression:</h2>
+<div id="what-inputs-go-in" class="section level3">
+<h3>What inputs go in:</h3>
+</div>
+<div id="what-is-the-analysis-going-to-do" class="section level3">
+<h3>What is the analysis going to do</h3>
+</div>
+<div id="what-are-the-outputswhat-is-the-meaning-of-the-outputs" class="section level3">
+<h3>What are the outputs/what is the meaning of the outputs</h3>
+</div>
+</div>
+<div id="my-experimental-design" class="section level2">
+<h2>(My) Experimental Design</h2>
+<div id="what-groups-am-i-going-to-compare-bio-factors-vs.tech-factors" class="section level3">
+<h3>What groups am I going to compare? (Bio factors vs. tech factors)</h3>
 <ul>
 <li><p>The groups of phenotype data being used can be sorted into two overarching categories: biological factors and technical factors. Biological factors include “Tissue_type”, “genotype_jak2”, “genotype_calr”, and “genotype_mpl”. Technical factors include: “collection_type”, “time_to_processing”, and “extraction_type”.</p></li>
 <li><p>The reason why I am splitting the data/analysis into two categories is to attempt to see whether certain factors from each category have an impact on specific gene counts or not.</p></li>
 <li><p>To be completed: Why im picking each of the columns within those sections</p></li>
 <li><p>I will separate demographic groups by phenotype, and compare gene expression counts for each of the genes between the two groups, groups defined by conditions of that factor. For example, the conditions of the factor of age could be different age groups, sex could be male or female, genotype could be present or not present, etc. ultimate goal is to make observations/conclusions about possible differences in gene counts between different groups that may or may not be significant in diagnosis of Myleofibrosis.</p></li>
 </ul>
+</div>
+</div>
 </div>
 <div id="data-import" class="section level1">
 <h1>Data Import</h1>
@@ -260,7 +295,7 @@ install.packages(&quot;rmarkdown&quot;)</code></pre>
 <p>“str()” is short for structure, and is a base R function that allows the user to get an idea of the format of the data they are looking at</p>
 <pre class="r"><code>df_pheno &lt;- read.csv(file=&quot;../RNASeqData/phenotypeTable.csv&quot;, 
                      header =TRUE)
-df_pheno &lt;-df_pheno %&gt;% rename( assay_material_id = ends_with(&quot;assay_material_id&quot;))
+df_pheno &lt;- df_pheno %&gt;% rename( assay_material_id = ends_with(&quot;assay_material_id&quot;))
 
 df_molecular &lt;- read.csv(file=&quot;../RNASeqData/molecularDataSets.csv&quot;, 
                          header =TRUE, sep=&quot;,&quot;)
@@ -342,8 +377,8 @@ head(FileIDList, n = 3)</code></pre>
                    } )</code></pre>
 </div>
 </div>
-<div id="to-do-prepare-rna-sequencing-data-for-analysis" class="section level1">
-<h1>TO DO: Prepare RNA Sequencing Data for Analysis</h1>
+<div id="in-progress-prepare-rna-sequencing-data-for-analysis" class="section level1">
+<h1>IN PROGRESS: Prepare RNA Sequencing Data for Analysis</h1>
 <p>Make the list of dataframes into one dataframe w/all contents of each dataframe in the dataframe of dataframes as columns using the “join_all” function from the plyr package. This produces a dataframe with the molecular ID and Genes in each sample assigned to a molecular ID columns.</p>
 <pre class="r"><code>all_joined_df &lt;- plyr:: join_all(listOf_alldf, by = NULL, 
                                  type = &quot;full&quot;, match = &quot;all&quot;)
@@ -364,13 +399,34 @@ head(all_joined_df, n = 3)</code></pre>
 ## 1       160       125       133       203
 ## 2        28        52        25        45
 ## 3         5         0         3         3</code></pre>
+<div id="summarizing-phenotypesdefining-experimental-design" class="section level2">
+<h2>Summarizing PHENOTYPES/defining experimental design</h2>
+<div id="biological-factors" class="section level3">
+<h3>Biological factors</h3>
+<pre class="r"><code>bio_factors_summary &lt;- df_pheno %&gt;% group_by(diagnosis, genotype_jak2, genotype_calr, age_range, sex) %&gt;% summarise(n())
+bio_factors_summary</code></pre>
+<pre><code>## # A tibble: 6 x 6
+## # Groups:   diagnosis, genotype_jak2, genotype_calr, age_range [?]
+##   diagnosis genotype_jak2 genotype_calr age_range   sex     `n()`
+##   &lt;fct&gt;     &lt;fct&gt;         &lt;fct&gt;         &lt;fct&gt;       &lt;fct&gt;   &lt;int&gt;
+## 1 mf        negative      negative      unknown     unknown     1
+## 2 mf        negative      positive      elderly61   male        1
+## 3 mf        negative      positive      unknown     unknown     5
+## 4 mf        positive      negative      adult18to60 male        1
+## 5 mf        positive      negative      unknown     unknown     4
+## 6 normal    notdetermined notdetermined adult18to60 unknown    12</code></pre>
+</div>
+<div id="technological-factors" class="section level3">
+<h3>Technological factors</h3>
+<pre class="r"><code>tech_factors_summary &lt;- df_pheno %&gt;% group_by(time_to_processing, collection_type, collection_event, extraction_type) %&gt;% summarise(n())</code></pre>
+</div>
+<div id="bio-tech-factors" class="section level3">
+<h3>Bio &amp; tech factors</h3>
+<pre class="r"><code>#bio_and_tech_summary &lt;- group_by(diagnosis, time_to_processing, genotype_jak2, collection_type,  genotype_calr, collection_event, age_range, extraction_type, sex) %&gt;% summarise(n())</code></pre>
+</div>
 <div id="create-a-summarized-experiment-data-set" class="section level3">
 <h3>Create a Summarized Experiment Data set</h3>
-</div>
-<div id="normalize-rna-sequencing-counts---in-new-normalized-data-frame" class="section level3">
-<h3>Normalize RNA Sequencing Counts - in new normalized data frame</h3>
-<div id="normalize-each-samples-counts-data-based-on-over-all-library-size-for-each-sample." class="section level4">
-<h4>(Normalize each sample’s counts data based on over all library size for each sample.)</h4>
+<p>(“Summarized Experiment” - something specific to DESeq2 package) ### Normalize RNA Sequencing Counts - in new normalized data frame ####(Normalize each sample’s counts data based on over all library size for each sample.)</p>
 </div>
 </div>
 </div>
