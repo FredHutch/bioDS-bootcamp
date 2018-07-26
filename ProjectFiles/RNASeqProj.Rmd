@@ -1,22 +1,46 @@
 ---
 title: "RNA Sequencing Differential Analysis Project"
 author: "Gavin Fortenberry"
-date: "July 16, 2018"
+date: "July 25, 2018"
 output:
   html_document:
-    toc: true
-    toc_float: true
+    toc: yes
+    toc_float: yes
+  pdf_document:
+    toc: yes
 ---
 # Introduction
+- What is MF?
+Myleofibrosis is a type of bone marrow cancer in which an rapidly increasing number of blood forming cells form a fibrous like structure that sometimes leads to acute leukemia. 
+Certain genotypes like the JAK2 V617F mutation have been a determining factor of Blast Transformation in Myleofibrosis.
 
+- What is diff gene express?
+ Differential gene expression is a way to analyze factors in different groups that may or may not be associated with different gene counts, from RNA sequence data.
+ 
+- What groups 2 analyse (to be filled in later) - why i chose them/why they important?
+The groups of phenotype data being used can be sorted into two overarching categories: biological factors and technical factors.
+-
+Biological factors include "Tissue_type", "genotype_jak2", "genotype_calr", and "genotype_mpl".
+-
+Technical factors include: "collection_type", "time_to_processing", and "extraction_type".
+- Explain the reasoning for both the difference in the bio vs. tech factors /// why im picking each of the columns within those sections
+Will separate demographic groups by phenotype, and compare gene expression counts between the
+two groups, groups defined by conditions of that factor
+(example:
+age:  - conditions of = age groups, 
+sex = male or female,
+genotype = present or not present).
+group 1:  male,
+group 2, female, (one or the other)
+in each group, compare gene counts for each gene.(aka counts of RNA molecules/expression of genes) 
+ultimate goal is to make observations/conclusions about possible differences in gene counts between different groups that may or may not be significant.
 # Data Import
 ## Install R Packages
 Installs packages of functions that can be used to help manipulate variables and data libraries. These packages can be installed through base R code that downloads them and installs them into R studio. Then certain programming phrases can be used to do new functions in connection with base R programming phrases, with an indicator of the package being used mentioned before using that package's functions. For example, if I wanted to use a function of the "dplyr" package, I would write -> "dplyr::(insert function here)(insert arguments of functions here)". Note that functions or phrases that are in base R programming vocabulary do not require a name indicator of the package being used, as it is from the base software and the software knows how to interperet those phrases without an idicator of a package. It is still required to write names of functions from Base R that are wanting to be used though, and if shortcut variables for functions are desired then you can assign new variables to those functions.
 ```{r Install Packages, eval=FALSE, message=FALSE, warning=FALSE, include=FALSE}
-install.packages("dplyr")
-install.packages("knitr")
-install.packages("rmarkdown")
-install.packages("utils")
+#install.packages("dplyr")
+#install.packages("knitr")
+#install.packages("rmarkdown")
 ```
 ## Load Libraries
 
@@ -114,16 +138,21 @@ head(all_joined_df, n = 3)
 ```
 
 ## Create a Summarized Experiment Data set
+```{r}
+#dplyr:: group_by(all_joined_df, "Gene", "molecular_id")
+dplyr:: group_by(df_combined, "sex", "molecular_id")
+```
+
 
 ## Normalize RNA Sequencing Counts
 
 # Differential Gene Expression Analysis with DESeq2
 
 ## Install Bioconductor, the DESeq2 Package and ggplot2
-
+## Bioconductor packages need to be installed by "biocLite" rather than install.packages which is for CRAN/base R
 ```{r Install Additional Packages, eval=FALSE, message=FALSE, warning=FALSE, include=FALSE}
 source("https://bioconductor.org/biocLite.R")
-biocLite("DESeq2")
+biocLite("DESeq2") 
 install.packages("ggplot2")
 ```
 ## Load Additional Packages
