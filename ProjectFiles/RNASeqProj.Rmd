@@ -1,30 +1,50 @@
 ---
 title: "RNA Sequencing Differential Analysis Project"
 author: "Gavin Fortenberry"
-date: "July 16, 2018"
+date: "July 26, 2018"
 output:
   html_document:
-    toc: true
-    toc_float: true
+    toc: yes
+    toc_float: yes
+  pdf_document:
+    toc: yes
+  word_document:
+    toc: yes
 ---
 # Introduction
+Myleofibrosis is a type of bone marrow cancer in which an rapidly increasing number of blood forming cells form a fibrous like structure that sometimes leads to acute leukemia. 
+Certain genotypes like the JAK2 V617F mutation have been a determining factor of Blast Transformation in Myleofibrosis.
+- What is differential gene expression?
+ Differential gene expression is a way to analyze factors in different groups that may or may not be associated with different gene counts, from RNA sequence data.
+ 
+- The groups of phenotype data being used can be sorted into two overarching categories: biological factors and technical factors.
+Biological factors include "Tissue_type", "genotype_jak2", "genotype_calr", and "genotype_mpl".
+Technical factors include: "collection_type", "time_to_processing", and "extraction_type".
+
+- The reason why I am splitting the data/analysis into two categories is to attempt to see whether certain factors from each category have an impact on specific gene counts or not.
+
+- To be completed: Why im picking each of the columns within those sections
+
+- I will separate demographic groups by phenotype, and compare gene expression counts for each of the genes between the
+two groups, groups defined by conditions of that factor. For example, the conditions of the factor of age could be different age groups, sex could be male or female, genotype could be present or not present, etc.
+ultimate goal is to make observations/conclusions about possible differences in gene counts between different groups that may or may not be significant in diagnosis of Myleofibrosis.
 
 # Data Import
-## Install R Packages
+### Install R Packages
 Installs packages of functions that can be used to help manipulate variables and data libraries. These packages can be installed through base R code that downloads them and installs them into R studio. Then certain programming phrases can be used to do new functions in connection with base R programming phrases, with an indicator of the package being used mentioned before using that package's functions. For example, if I wanted to use a function of the "dplyr" package, I would write -> "dplyr::(insert function here)(insert arguments of functions here)". Note that functions or phrases that are in base R programming vocabulary do not require a name indicator of the package being used, as it is from the base software and the software knows how to interperet those phrases without an idicator of a package. It is still required to write names of functions from Base R that are wanting to be used though, and if shortcut variables for functions are desired then you can assign new variables to those functions.
-```{r Install Packages, eval=FALSE, message=FALSE, warning=FALSE, include=FALSE}
+
+```{r Install Packages, eval=FALSE, message=FALSE, warning=FALSE, include=TRUE}
 install.packages("dplyr")
 install.packages("knitr")
 install.packages("rmarkdown")
-install.packages("utils")
 ```
-## Load Libraries
+### Load Libraries
 
-```{r Load Libraries, message=FALSE, warning=FALSE, include=FALSE, paged.print=FALSE}
+```{r Load Libraries, message=FALSE, warning=FALSE, include=TRUE, paged.print=FALSE}
 library(plyr); library(dplyr)
 ```
 
-## Read in Project Metadata to R
+### Read in Project Metadata to R
 Reads the two CSV's and combines them into one data frame:
 The code below creates three data frames: one labeled as "df_pheno" for data of a  file called phenotable, which contains demographics and general information from patients and samples taken from them, another labeled as "df_molecular" for data from another file called molecularDataSets, which contains more specific info on samples collected from patients and their diagnoses from these samples, and another labeled as "df_combined" that combines the two data frames according to common columns.
 
@@ -60,7 +80,7 @@ write.csv(df_combined, file = "../ProjectFiles/combineddata.csv",
 ```
 
 The read.csv function is used to re-read the newly written CSV to make sure the data is the same as it was when written. The "str()" and "summary" functions are used to compare the statistics of the new dataframe to the original created one to confirm similarity.
-```{r Test Output of newly written CSV, eval=FALSE, include=FALSE}
+```{r Test Output of newly written CSV, eval=FALSE, include=TRUE}
 test_set_combined_data <- read.csv("combineddata.csv")
 str(test_set_combined_data)
 ```
@@ -104,7 +124,7 @@ listOf_alldf <- lapply(seq(1:nrow(FileIDList)),
                    } )
 ```
 
-# Prepare RNA Sequencing Data for Analysis
+# TO DO: Prepare RNA Sequencing Data for Analysis
 Make the list of dataframes into one dataframe w/all contents of each dataframe in the dataframe of dataframes as columns using the "join_all" function from the plyr package.
 This produces a dataframe with the molecular ID and Genes in each sample assigned to a molecular ID columns.
 ```{r Join All Data, message=FALSE, warning=FALSE}
@@ -113,23 +133,29 @@ all_joined_df <- plyr:: join_all(listOf_alldf, by = NULL,
 head(all_joined_df, n = 3)
 ```
 
-## Create a Summarized Experiment Data set
+### Create a Summarized Experiment Data set
 
-## Normalize RNA Sequencing Counts
+```{r eval=FALSE, include=FALSE}
+#dplyr:: group_by(all_joined_df, "Gene", "molecular_id")
+#dplyr:: group_by(df_combined, "sex", "molecular_id")
+```
 
-# Differential Gene Expression Analysis with DESeq2
 
-## Install Bioconductor, the DESeq2 Package and ggplot2
+### Normalize RNA Sequencing Counts - in new normalized data frame
+####(Normalize each sample's counts data based on over all library size for each sample.)
 
+
+# TO DO: Differential Gene Expression Analysis with DESeq2
+
+### Install Bioconductor, the DESeq2 Package and ggplot2
+Bioconductor packages need to be installed by "biocLite" rather than install.packages which is for CRAN/base R
 ```{r Install Additional Packages, eval=FALSE, message=FALSE, warning=FALSE, include=FALSE}
 source("https://bioconductor.org/biocLite.R")
 biocLite("DESeq2")
 install.packages("ggplot2")
 ```
-## Load Additional Packages
-```{r Load Additional Libraries, eval=FALSE, message=FALSE, warning=FALSE, include=FALSE}
+
+### Load Additional Packages
+```{r Load Additional Libraries, eval=TRUE, message=FALSE, warning=FALSE, include=TRUE}
 library(DESeq2); library(ggplot2)
 ```
-
-
-

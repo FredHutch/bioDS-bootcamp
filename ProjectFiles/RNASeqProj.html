@@ -11,7 +11,7 @@
 
 <meta name="author" content="Gavin Fortenberry" />
 
-<meta name="date" content="2018-07-16" />
+<meta name="date" content="2018-07-26" />
 
 <title>RNA Sequencing Differential Analysis Project</title>
 
@@ -222,25 +222,36 @@ div.tocify {
 
 <h1 class="title toc-ignore">RNA Sequencing Differential Analysis Project</h1>
 <h4 class="author"><em>Gavin Fortenberry</em></h4>
-<h4 class="date"><em>July 16, 2018</em></h4>
+<h4 class="date"><em>July 26, 2018</em></h4>
 
 </div>
 
 
 <div id="introduction" class="section level1">
 <h1>Introduction</h1>
+<p>Myleofibrosis is a type of bone marrow cancer in which an rapidly increasing number of blood forming cells form a fibrous like structure that sometimes leads to acute leukemia. Certain genotypes like the JAK2 V617F mutation have been a determining factor of Blast Transformation in Myleofibrosis. - What is differential gene expression? Differential gene expression is a way to analyze factors in different groups that may or may not be associated with different gene counts, from RNA sequence data.</p>
+<ul>
+<li><p>The groups of phenotype data being used can be sorted into two overarching categories: biological factors and technical factors. Biological factors include “Tissue_type”, “genotype_jak2”, “genotype_calr”, and “genotype_mpl”. Technical factors include: “collection_type”, “time_to_processing”, and “extraction_type”.</p></li>
+<li><p>The reason why I am splitting the data/analysis into two categories is to attempt to see whether certain factors from each category have an impact on specific gene counts or not.</p></li>
+<li><p>To be completed: Why im picking each of the columns within those sections</p></li>
+<li><p>I will separate demographic groups by phenotype, and compare gene expression counts for each of the genes between the two groups, groups defined by conditions of that factor. For example, the conditions of the factor of age could be different age groups, sex could be male or female, genotype could be present or not present, etc. ultimate goal is to make observations/conclusions about possible differences in gene counts between different groups that may or may not be significant in diagnosis of Myleofibrosis.</p></li>
+</ul>
 </div>
 <div id="data-import" class="section level1">
 <h1>Data Import</h1>
-<div id="install-r-packages" class="section level2">
-<h2>Install R Packages</h2>
+<div id="install-r-packages" class="section level3">
+<h3>Install R Packages</h3>
 <p>Installs packages of functions that can be used to help manipulate variables and data libraries. These packages can be installed through base R code that downloads them and installs them into R studio. Then certain programming phrases can be used to do new functions in connection with base R programming phrases, with an indicator of the package being used mentioned before using that package’s functions. For example, if I wanted to use a function of the “dplyr” package, I would write -&gt; “dplyr::(insert function here)(insert arguments of functions here)”. Note that functions or phrases that are in base R programming vocabulary do not require a name indicator of the package being used, as it is from the base software and the software knows how to interperet those phrases without an idicator of a package. It is still required to write names of functions from Base R that are wanting to be used though, and if shortcut variables for functions are desired then you can assign new variables to those functions.</p>
+<pre class="r"><code>install.packages(&quot;dplyr&quot;)
+install.packages(&quot;knitr&quot;)
+install.packages(&quot;rmarkdown&quot;)</code></pre>
 </div>
-<div id="load-libraries" class="section level2">
-<h2>Load Libraries</h2>
+<div id="load-libraries" class="section level3">
+<h3>Load Libraries</h3>
+<pre class="r"><code>library(plyr); library(dplyr)</code></pre>
 </div>
-<div id="read-in-project-metadata-to-r" class="section level2">
-<h2>Read in Project Metadata to R</h2>
+<div id="read-in-project-metadata-to-r" class="section level3">
+<h3>Read in Project Metadata to R</h3>
 <p>Reads the two CSV’s and combines them into one data frame: The code below creates three data frames: one labeled as “df_pheno” for data of a file called phenotable, which contains demographics and general information from patients and samples taken from them, another labeled as “df_molecular” for data from another file called molecularDataSets, which contains more specific info on samples collected from patients and their diagnoses from these samples, and another labeled as “df_combined” that combines the two data frames according to common columns.</p>
 <p>The overall purpose of this code chunk is to create the combined data frame.</p>
 <p>The first two data frames created (“df_pheno” and “df_molecular”) were created using base R code “read.csv” function, which reads in data into a data frame from a CSV, a comma seperated values document.</p>
@@ -292,6 +303,8 @@ head(df_combined, n = 3)</code></pre>
 <pre class="r"><code>write.csv(df_combined, file = &quot;../ProjectFiles/combineddata.csv&quot;, 
           row.names = FALSE)</code></pre>
 <p>The read.csv function is used to re-read the newly written CSV to make sure the data is the same as it was when written. The “str()” and “summary” functions are used to compare the statistics of the new dataframe to the original created one to confirm similarity.</p>
+<pre class="r"><code>test_set_combined_data &lt;- read.csv(&quot;combineddata.csv&quot;)
+str(test_set_combined_data)</code></pre>
 </div>
 <div id="read-in-rna-sequencing-data-from-hisat2htseqcount" class="section level2">
 <h2>Read in RNA Sequencing Data from HiSat2/htseqcount</h2>
@@ -329,8 +342,8 @@ head(FileIDList, n = 3)</code></pre>
                    } )</code></pre>
 </div>
 </div>
-<div id="prepare-rna-sequencing-data-for-analysis" class="section level1">
-<h1>Prepare RNA Sequencing Data for Analysis</h1>
+<div id="to-do-prepare-rna-sequencing-data-for-analysis" class="section level1">
+<h1>TO DO: Prepare RNA Sequencing Data for Analysis</h1>
 <p>Make the list of dataframes into one dataframe w/all contents of each dataframe in the dataframe of dataframes as columns using the “join_all” function from the plyr package. This produces a dataframe with the molecular ID and Genes in each sample assigned to a molecular ID columns.</p>
 <pre class="r"><code>all_joined_df &lt;- plyr:: join_all(listOf_alldf, by = NULL, 
                                  type = &quot;full&quot;, match = &quot;all&quot;)
@@ -351,20 +364,25 @@ head(all_joined_df, n = 3)</code></pre>
 ## 1       160       125       133       203
 ## 2        28        52        25        45
 ## 3         5         0         3         3</code></pre>
-<div id="create-a-summarized-experiment-data-set" class="section level2">
-<h2>Create a Summarized Experiment Data set</h2>
+<div id="create-a-summarized-experiment-data-set" class="section level3">
+<h3>Create a Summarized Experiment Data set</h3>
 </div>
-<div id="normalize-rna-sequencing-counts" class="section level2">
-<h2>Normalize RNA Sequencing Counts</h2>
+<div id="normalize-rna-sequencing-counts---in-new-normalized-data-frame" class="section level3">
+<h3>Normalize RNA Sequencing Counts - in new normalized data frame</h3>
+<div id="normalize-each-samples-counts-data-based-on-over-all-library-size-for-each-sample." class="section level4">
+<h4>(Normalize each sample’s counts data based on over all library size for each sample.)</h4>
 </div>
 </div>
-<div id="differential-gene-expression-analysis-with-deseq2" class="section level1">
-<h1>Differential Gene Expression Analysis with DESeq2</h1>
-<div id="install-bioconductor-the-deseq2-package-and-ggplot2" class="section level2">
-<h2>Install Bioconductor, the DESeq2 Package and ggplot2</h2>
 </div>
-<div id="load-additional-packages" class="section level2">
-<h2>Load Additional Packages</h2>
+<div id="to-do-differential-gene-expression-analysis-with-deseq2" class="section level1">
+<h1>TO DO: Differential Gene Expression Analysis with DESeq2</h1>
+<div id="install-bioconductor-the-deseq2-package-and-ggplot2" class="section level3">
+<h3>Install Bioconductor, the DESeq2 Package and ggplot2</h3>
+<p>Bioconductor packages need to be installed by “biocLite” rather than install.packages which is for CRAN/base R</p>
+</div>
+<div id="load-additional-packages" class="section level3">
+<h3>Load Additional Packages</h3>
+<pre class="r"><code>library(DESeq2); library(ggplot2)</code></pre>
 </div>
 </div>
 
