@@ -1,5 +1,5 @@
 # bioDS-bootcamp
-A repo for new interns learning the basics of biomedical data science, now with more Gavin.  
+A repo for new interns learning the basics of biomedical data science
 
 ## Annotation Definitions
 To see the current definitions of the annotations included alongside the datasets in this repo, please visit this link and [click on the "TGDCC" tab.](https://translationalgenomics.shinyapps.io/FHOntologyBrowser/)
