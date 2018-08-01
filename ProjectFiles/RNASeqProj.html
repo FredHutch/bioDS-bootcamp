@@ -242,6 +242,9 @@ div.tocify {
 </ul>
 <div id="what-is-gene-expression" class="section level3">
 <h3>What is gene expression?</h3>
+<ul>
+<li>Gene expression is the process of which information inside a gene is used to make RNA and proteins. The genotype leads to the phenotype.</li>
+</ul>
 </div>
 <div id="why-is-differential-gene-expression-important-to-a-biological-question" class="section level3">
 <h3>Why is differential gene expression important to a biological question?</h3>
@@ -295,7 +298,7 @@ install.packages(&quot;rmarkdown&quot;)</code></pre>
 <p>“str()” is short for structure, and is a base R function that allows the user to get an idea of the format of the data they are looking at</p>
 <pre class="r"><code>df_pheno &lt;- read.csv(file=&quot;../RNASeqData/phenotypeTable.csv&quot;, 
                      header =TRUE)
-df_pheno &lt;- df_pheno %&gt;% rename( assay_material_id = ends_with(&quot;assay_material_id&quot;))
+df_pheno &lt;- df_pheno %&gt;% rename(assay_material_id = ends_with(&quot;assay_material_id&quot;))
 
 df_molecular &lt;- read.csv(file=&quot;../RNASeqData/molecularDataSets.csv&quot;, 
                          header =TRUE, sep=&quot;,&quot;)
@@ -418,7 +421,7 @@ bio_factors_summary</code></pre>
 </div>
 <div id="technological-factors" class="section level3">
 <h3>Technological factors</h3>
-<pre class="r"><code>tech_factors_summary &lt;- df_pheno %&gt;% group_by(time_to_processing, collection_type, collection_event, extraction_type) %&gt;% summarise(n())</code></pre>
+<pre class="r"><code>#tech_factors_summary &lt;- df_pheno %&gt;% group_by(time_to_processing, collection_type, collection_event, extraction_type) %&gt;% summarise(n())</code></pre>
 </div>
 <div id="bio-tech-factors" class="section level3">
 <h3>Bio &amp; tech factors</h3>
