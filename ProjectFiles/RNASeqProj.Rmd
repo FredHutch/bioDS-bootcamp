@@ -228,11 +228,33 @@ dseqstuff <- DESeqDataSetFromMatrix(countsMat,phenoMat, design = ~ diagnosis)
 dseqstuff$diagnosis <- relevel(dseqstuff$diagnosis, "normal")
 
 dseqstuff <- dseqstuff[ rowSums(counts(dseqstuff)) > 1, ] #gets rid of 1's and 0's
+head(dseqstuff)
 ```
 
 
 
 ```{r DiffGeneAnalysis}
-#use Deseqdataset to do analysis using deseq2 tools???
+###use Deseqdataset to do analysis using deseq2 tools???
+
+
+### Copied from https://bioconductor.org/packages/release/bioc/vignettes/DESeq2/inst/doc/DESeq2.html#differential-expression-analysis ...IMPORTANT!~!!!!!!!~!~!~!
+
+###A DESeqDataSet object must have an associated design formula. The design formula expresses the variables which will be used in modeling. The formula should be a tilde (~) followed by the variables with plus signs between them (it will be coerced into an formula if it is not already). The design can be changed later, however then all differential analysis steps should be repeated, as the design formula is used to estimate the dispersions and to estimate the log2 fold changes of the model.
+
+###Note: In order to benefit from the default settings of the package, you should put the variable of interest at the end of the formula and make sure the control level is the first level.
+
+
+#DESeq2::plotCounts(dseqstuff, "CALR", intgroup = "diagnosis")
+
+dseqstuffCopy <- dseqstuff
+design(dseqstuffCopy) <- formula(~ diagnosis)
+dseqstuffCopy <- DESeq(dseqstuffCopy)
+
+
+```
+
+```{r}
+resDseqCopy <- results(dseqstuffCopy)
+head(resDseqCopy)
 ```
 
