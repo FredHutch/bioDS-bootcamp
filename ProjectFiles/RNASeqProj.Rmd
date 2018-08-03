@@ -231,30 +231,80 @@ dseqstuff <- dseqstuff[ rowSums(counts(dseqstuff)) > 1, ] #gets rid of 1's and 0
 head(dseqstuff)
 ```
 
-
-
-```{r DiffGeneAnalysis}
 ###use Deseqdataset to do analysis using deseq2 tools???
 
-
-### Copied from https://bioconductor.org/packages/release/bioc/vignettes/DESeq2/inst/doc/DESeq2.html#differential-expression-analysis ...IMPORTANT!~!!!!!!!~!~!~!
+### Following paragraph/description Copied from https://bioconductor.org/packages/release/bioc/vignettes/DESeq2/inst/doc/DESeq2.html#differential-expression-analysis ...IMPORTANT!~!!!!!!!~!~!~!
 
 ###A DESeqDataSet object must have an associated design formula. The design formula expresses the variables which will be used in modeling. The formula should be a tilde (~) followed by the variables with plus signs between them (it will be coerced into an formula if it is not already). The design can be changed later, however then all differential analysis steps should be repeated, as the design formula is used to estimate the dispersions and to estimate the log2 fold changes of the model.
 
 ###Note: In order to benefit from the default settings of the package, you should put the variable of interest at the end of the formula and make sure the control level is the first level.
-
+```{r DiffGeneAnalysis pt1}
 
 #DESeq2::plotCounts(dseqstuff, "CALR", intgroup = "diagnosis")
 
+###base lvl = diagnosis
 dseqstuffCopy <- dseqstuff
 design(dseqstuffCopy) <- formula(~ diagnosis)
 dseqstuffCopy <- DESeq(dseqstuffCopy)
 
 
 ```
-
+Gives results of formula:
 ```{r}
 resDseqCopy <- results(dseqstuffCopy)
 head(resDseqCopy)
+```
+```{r DiffGeneAnalysis pt2}
+###base lvl = age range
+dseqstuffCopy2 <- dseqstuff
+design(dseqstuffCopy2) <- formula(~ age_range)
+dseqstuffCopy2 <- DESeq(dseqstuffCopy2)
+
+
+```
+Gives results of formula 2:
+```{r}
+resDseqCopy2 <- results(dseqstuffCopy2)
+head(resDseqCopy2)
+###p val dif = low, chance there is a sig. dif.. threshhold = 0.05?
+```
+
+
+
+
+
+#Repeated processes w/salmon.txt files
+```{r}
+FileList2 = sapply(RNADirectoryList, 
+                   function(x){list.files(path = x, 
+                                          full.names = TRUE, 
+                                          pattern = "salmon.txt") }) 
+
+FileIDList2 <- as.data.frame(cbind(FileList2, 
+                                  gsub("^.*-","", RNADirectoryList)), 
+                            stringsAsFactors = F)
+colnames(FileIDList2) <- c("Path", "molecular_id")
+head(FileIDList2, n = 3)
+
+
+
+
+#Creates list of dataframes
+
+listOf_alldf2 <- lapply(seq(1:nrow(FileIDList2)),
+                 function(i){ 
+                   X <- read.delim(file = FileIDList2$Path[i],
+                                         header = FALSE);
+                   colnames(X) <- c("Gene", FileIDList2$molecular_id[i]);
+                   return(X)
+                   } )
+
+
+
+
+
+#all_joined_df2 <- plyr:: join_all(listOf_alldf2, by = NULL, 
+#                                 type = "full", match = "all")
+#head(all_joined_df2, n = 3)
 ```
 
