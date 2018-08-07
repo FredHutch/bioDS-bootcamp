@@ -205,9 +205,10 @@ install.packages("ggplot2")
 library(DESeq2); library(ggplot2)
 ```
 
-### Creating matricies / ordering row names
+### Creating matricies / ordering row names !!!11!!11!!! ...make more comments
 ```{r DeSeq2 Stuff}
 countsMat = as.matrix(all_joined_df[,-1]); ncol(countsMat)          #COLS
+head(countsMat)
 rownames(countsMat)<- all_joined_df[,1] 
 
 
@@ -274,37 +275,63 @@ head(resDseqCopy2)
 
 
 #Repeated processes w/salmon.txt files
+```{r }
+
+
+######
+new
+######
+salmonCounts_df <-read.csv(file="../RNASeqData/2018-08-06_SalmonGeneLevelCounts.csv", 
+                     header =TRUE)
+salmonCounts_genes <- as.character(salmonCounts_df[ , 25] )
+salmonCountsMat <- sapply(salmonCounts_df[ , -25],as.integer) 
+#head(salmonCounts_df)
+rownames(salmonCountsMat) <- salmonCounts_genes
+
+
+
+head(salmonCountsMat, n = 4)
+str(salmonCountsMat)
+
+#CONVERT NUMBERS TO INTEGERS IN MATRIX, SALMONCOUNTSMAT
+
+dseq_salmon <- DESeqDataSetFromMatrix(salmonCountsMat,phenoMat, design = ~ diagnosis)
+
+
+
+
+dseq_salmon$diagnosis <- relevel(dseq_salmon$diagnosis, "normal")
+
+dseq_salmon <- dseq_salmon[ rowSums(counts(dseq_salmon)) > 1, ] #gets rid of 1's and 0's
+head(dseq_salmon)
+
+
+
+
+dseq_salmonCopy <- dseq_salmon
+design(dseq_salmonCopy ) <- formula(~ diagnosis)
+dseq_salmonCopy  <- DESeq(dseq_salmonCopy )
+
+resDseq_salmonCopy <- results(dseq_salmonCopy)
+head(resDseq_salmonCopy)
+
+
+
+
+
+
+```
+
 ```{r}
-FileList2 = sapply(RNADirectoryList, 
-                   function(x){list.files(path = x, 
-                                          full.names = TRUE, 
-                                          pattern = "salmon.txt") }) 
-
-FileIDList2 <- as.data.frame(cbind(FileList2, 
-                                  gsub("^.*-","", RNADirectoryList)), 
-                            stringsAsFactors = F)
-colnames(FileIDList2) <- c("Path", "molecular_id")
-head(FileIDList2, n = 3)
 
 
+###Extract log2FoldChange columns from htseq and salmon datasets,
+###merge into combined DF with genes as rownames, use geom-point to plot in GGplot
+### x= LF2C Salmon, Y= LF2C HTSEQ
 
 
-#Creates list of dataframes
-
-listOf_alldf2 <- lapply(seq(1:nrow(FileIDList2)),
-                 function(i){ 
-                   X <- read.delim(file = FileIDList2$Path[i],
-                                         header = FALSE);
-                   colnames(X) <- c("Gene", FileIDList2$molecular_id[i]);
-                   return(X)
-                   } )
+```
 
 
-
-
-
-#all_joined_df2 <- plyr:: join_all(listOf_alldf2, by = NULL, 
-#                                 type = "full", match = "all")
-#head(all_joined_df2, n = 3)
 ```
 
