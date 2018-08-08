@@ -330,8 +330,56 @@ head(resDseq_salmonCopy)
 ### x= LF2C Salmon, Y= LF2C HTSEQ
 
 
-```
 
+###resDseqCopy vs. resDseq_salmonCopy =diagnosis base level = normal
+
+###head(resDseqCopy)
+###head(resDseq_salmonCopy)
+
+
+###convert rownames to column name gene in both df's
+###full join by gene
+
+
+###creates two new df's with l2fc data
+
+###create new column with values of rownames
+resDseqCopy$Gene <- rownames(resDseqCopy)
+resDseq_salmonCopy$Gene <- rownames(resDseq_salmonCopy)
+
+head(resDseqCopy)
+
+###Subset/put in a copy of the gene column and logfold2 column from the htseq data into new object/df
+gene_l2fc_htseq1 <- as.data.frame(resDseqCopy[ ,c(7, 2)])
+
+###Getting rid of rownames (gene list is in new column)
+rownames(gene_l2fc_htseq1) = NULL
+
+###Repeating same process for Salmon as HTSEQ
+gene_l2fc_salmon1 <- as.data.frame(resDseq_salmonCopy[ ,c(7, 2)])
+rownames(gene_l2fc_salmon1) = NULL
+
+###Tests
+head(gene_l2fc_salmon1)
+str(gene_l2fc_htseq1)
+str(gene_l2fc_salmon1)
+
+###Joining two DF's of LF2C by Gene
+gene_l2fc_htseqSalmon1_combo <- full_join(gene_l2fc_htseq1, gene_l2fc_salmon1, by = "Gene")
+
+#Setting Column names
+colnames(gene_l2fc_htseqSalmon1_combo) <- c("Gene", "L2FC_HTSEQ","L2FC_SALMON")
+
+head(gene_l2fc_htseqSalmon1_combo)
+
+```
+```{r Plotting part 1}
+p1 = ggplot(data = gene_l2fc_htseqSalmon1_combo, aes(x= L2FC_SALMON, y = L2FC_HTSEQ)) + geom_point()
+p1
+
+#EXPLAIN WHAT L2FC IS
+#each dot corresponds to 2 logfoldchanges for one gene
+#numbers are l2fc of mf vs normal gene expression
 
 ```
 
