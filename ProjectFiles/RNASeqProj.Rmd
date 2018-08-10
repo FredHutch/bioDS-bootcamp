@@ -60,14 +60,24 @@ ultimate goal is to make observations/conclusions about possible differences in 
 ### Install R Packages
 Installs packages of functions that can be used to help manipulate variables and data libraries. These packages can be installed through base R code that downloads them and installs them into R studio. Then certain programming phrases can be used to do new functions in connection with base R programming phrases, with an indicator of the package being used mentioned before using that package's functions. For example, if I wanted to use a function of the "dplyr" package, I would write -> "dplyr::(insert function here)(insert arguments of functions here)". Note that functions or phrases that are in base R programming vocabulary do not require a name indicator of the package being used, as it is from the base software and the software knows how to interperet those phrases without an idicator of a package. It is still required to write names of functions from Base R that are wanting to be used though, and if shortcut variables for functions are desired then you can assign new variables to those functions.
 
+Bioconductor packages need to be installed by "biocLite" rather than install.packages which is for CRAN/base R
 ```{r Install Packages, eval=FALSE, message=FALSE, warning=FALSE, include=TRUE}
 install.packages("dplyr")
 install.packages("knitr")
 install.packages("rmarkdown")
-```
-### Load Libraries
 
-```{r Load Libraries, message=FALSE, warning=FALSE, include=TRUE, paged.print=FALSE}
+
+
+
+### Install Bioconductor, the DESeq2 Package and ggplot2
+source("https://bioconductor.org/biocLite.R")
+biocLite("DESeq2")
+install.packages("ggplot2")
+```
+
+### Load Additional Packages
+```{r Load Additional Libraries, eval=TRUE, message=FALSE, warning=FALSE, include=TRUE}
+library(DESeq2); library(ggplot2)
 library(plyr); library(dplyr)
 ```
 
@@ -156,9 +166,9 @@ Make the list of dataframes into one dataframe w/all contents of each dataframe 
 This produces a dataframe with the molecular ID and Genes in each sample assigned to a molecular ID columns.
 ```{r Join All Data, message=FALSE, warning=FALSE}
 ###THIS MATTERS- MOLECULAR ID's LINKED TO THE PHENOTABLE
-all_joined_df <- plyr:: join_all(listOf_alldf, by = NULL, 
+htseq_genecounts_df <- plyr:: join_all(listOf_alldf, by = NULL, 
                                  type = "full", match = "all")
-head(all_joined_df, n = 3)
+head(htseq_genecounts_df, n = 3)
 ```
 
 
@@ -172,13 +182,14 @@ bio_factors_summary
 
 ###Technological factors
 ```{r echo=TRUE}
-#tech_factors_summary <- df_pheno %>% group_by(time_to_processing, collection_type, collection_event, extraction_type) %>% summarise(n())
-
+tech_factors_summary <- df_pheno %>% group_by(time_to_processing, collection_type, collection_event, extraction_type) %>% summarise(n())
+tech_factors_summary
 ```
 
 ###Bio & tech factors
 ```{r}
-#bio_and_tech_summary <- group_by(diagnosis, time_to_processing, genotype_jak2, collection_type,  genotype_calr, collection_event, age_range, extraction_type, sex) %>% summarise(n())
+bio_and_tech_summary <- df_pheno %>% group_by(diagnosis, time_to_processing, genotype_jak2, collection_type,  genotype_calr, collection_event, age_range, extraction_type, sex) %>% summarise(n())
+bio_and_tech_summary
 ```
 
 
@@ -190,45 +201,46 @@ bio_factors_summary
 ####(Normalize each sample's counts data based on over all library size for each sample.)
 
 
-# TO DO: Differential Gene Expression Analysis with DESeq2
+# Differential Gene Expression Analysis with DESeq2
 
-### Install Bioconductor, the DESeq2 Package and ggplot2
-Bioconductor packages need to be installed by "biocLite" rather than install.packages which is for CRAN/base R
-```{r Install Additional Packages, eval=FALSE, message=FALSE, warning=FALSE, include=FALSE}
-source("https://bioconductor.org/biocLite.R")
-biocLite("DESeq2")
-install.packages("ggplot2")
-```
-
-### Load Additional Packages
-```{r Load Additional Libraries, eval=TRUE, message=FALSE, warning=FALSE, include=TRUE}
-library(DESeq2); library(ggplot2)
-```
-
-### Creating matricies / ordering row names !!!11!!11!!! ...make more comments
-```{r DeSeq2 Stuff}
-countsMat = as.matrix(all_joined_df[,-1]); ncol(countsMat)          #COLS
-head(countsMat)
-rownames(countsMat)<- all_joined_df[,1] 
+####HERE DOWN->
 
 
+Optimizing compatability for creating DataSets for DESEQ2 (EDITS = DONE) , !!MAY need to consider separating into two code chunks!!
+```{r Creating matricies / ordering and setting row names and col names}
+
+#Creats HTSEQ counts matrix
+#Imports everything from HTSEQ Counts dataframe except the first column (Doesn't delete column from original dataframe)
+htseqCountsMat = as.matrix(htseq_genecounts_df[,-1]); ncol(htseqCountsMat)          #COLS
+head(htseqCountsMat)
+
+#Sets rownames of new matrix of HTSEQ count data to gene names in 1st column of original dataframe
+rownames(htseqCountsMat)<- htseq_genecounts_df[,1] 
+
+#Creates matrix phenoMat from df_combined dataframe
+# Imports all data/columns except molecular ID column (doesnt delete from original dataframe, just doesnt include on import)
 phenoMat = as.matrix(subset(df_combined, select=-molecular_id)); nrow(phenoMat) 
 
-#SETS ROWNAMES TO COLNAMES OF COUNTSMAT (molecular ID)
+#Sets rownames of phenoMat to data from df_combined  column of molecular ID's
 rownames(phenoMat)<- df_combined$molecular_id
 
-#Link column names AND column values  of countsmat to phenoMat row names in same order
-phenoMat <- phenoMat[match(colnames(countsMat),row.names(phenoMat)),]
+#Link column names AND column values  of htseqCountsMat to phenoMat row names in same order
+phenoMat <- phenoMat[match(colnames(htseqCountsMat),row.names(phenoMat)),]
+head(phenoMat)
 
 ```
 
+(EDITS = NOT DONE)
+```{r MakeDeseqDataset 1} 
+#DataSet for DESEQ from HTSEQ Matrix created 
+# variable comparing is diagnosis [levels  = mf (myleofibrosis) and normal (no myleofibrosis) ]
+dseqstuff <- DESeqDataSetFromMatrix(htseqCountsMat,phenoMat, design = ~ diagnosis)
 
-```{r MakeDeseqDataset} 
-dseqstuff <- DESeqDataSetFromMatrix(countsMat,phenoMat, design = ~ diagnosis)
-
+# with base level being at "normal" (not myleofibrosis)
 dseqstuff$diagnosis <- relevel(dseqstuff$diagnosis, "normal")
 
-dseqstuff <- dseqstuff[ rowSums(counts(dseqstuff)) > 1, ] #gets rid of 1's and 0's
+#gets rid of rows of gene counts of 1's and 0's
+dseqstuff <- dseqstuff[ rowSums(counts(dseqstuff)) > 1, ] 
 head(dseqstuff)
 ```
 
@@ -239,7 +251,8 @@ head(dseqstuff)
 ###A DESeqDataSet object must have an associated design formula. The design formula expresses the variables which will be used in modeling. The formula should be a tilde (~) followed by the variables with plus signs between them (it will be coerced into an formula if it is not already). The design can be changed later, however then all differential analysis steps should be repeated, as the design formula is used to estimate the dispersions and to estimate the log2 fold changes of the model.
 
 ###Note: In order to benefit from the default settings of the package, you should put the variable of interest at the end of the formula and make sure the control level is the first level.
-```{r DiffGeneAnalysis pt1}
+
+```{r DiffGeneAnalysis Design 1}
 
 #DESeq2::plotCounts(dseqstuff, "CALR", intgroup = "diagnosis")
 
@@ -251,11 +264,11 @@ dseqstuffCopy <- DESeq(dseqstuffCopy)
 
 ```
 Gives results of formula:
-```{r}
+```{r Design 1 Results}
 resDseqCopy <- results(dseqstuffCopy)
 head(resDseqCopy)
 ```
-```{r DiffGeneAnalysis pt2}
+```{r DiffGeneAnalysis Design 2}
 ###base lvl = age range
 dseqstuffCopy2 <- dseqstuff
 design(dseqstuffCopy2) <- formula(~ age_range)
@@ -264,7 +277,7 @@ dseqstuffCopy2 <- DESeq(dseqstuffCopy2)
 
 ```
 Gives results of formula 2:
-```{r}
+```{r Design 2 Results}
 resDseqCopy2 <- results(dseqstuffCopy2)
 head(resDseqCopy2)
 ###p val dif = low, chance there is a sig. dif.. threshhold = 0.05?
@@ -281,19 +294,32 @@ head(resDseqCopy2)
 ######
 new
 ######
+
+### Reads in data/creates salmon counts dataframe
 salmonCounts_df <-read.csv(file="../RNASeqData/2018-08-06_SalmonGeneLevelCounts.csv", 
                      header =TRUE)
+
+# Assigns gene names from salmon counts dataframe to variable in order to keep them set as characters/strings
 salmonCounts_genes <- as.character(salmonCounts_df[ , 25] )
+
+# Creates matrix of salmon counts from salmon count data frame
+# Converts numbers with decimals to integers (no decimals)  in salmon counts matrix, 
 salmonCountsMat <- sapply(salmonCounts_df[ , -25],as.integer) 
+
 #head(salmonCounts_df)
+
+# Sets rownames of new salmon counts matrix to gene names of salmon counts dataframe
 rownames(salmonCountsMat) <- salmonCounts_genes
 
 
 
 head(salmonCountsMat, n = 4)
 str(salmonCountsMat)
+```
 
-#CONVERT NUMBERS TO INTEGERS IN MATRIX, SALMONCOUNTSMAT
+
+
+```{r }
 
 dseq_salmon <- DESeqDataSetFromMatrix(salmonCountsMat,phenoMat, design = ~ diagnosis)
 
@@ -321,6 +347,10 @@ head(resDseq_salmonCopy)
 
 
 ```
+
+
+
+
 
 ```{r}
 
@@ -382,4 +412,15 @@ p1
 #numbers are l2fc of mf vs normal gene expression
 
 ```
+```{r Plotting part 2}
+#resDseqCopy #htseq
+
+#gene_l2fc_htseq1_all <- as.data.frame(resDseqCopy)
+
+
+
+#resDseq_salmonCopy #Salmon
+```
+
+
 
