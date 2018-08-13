@@ -79,6 +79,7 @@ install.packages("ggplot2")
 ```{r Load Additional Libraries, eval=TRUE, message=FALSE, warning=FALSE, include=TRUE}
 library(DESeq2); library(ggplot2)
 library(plyr); library(dplyr)
+library(gghighlight)
 ```
 
 ### Read in Project Metadata to R
@@ -349,10 +350,23 @@ head(resDseq_salmonCopy)
 ```
 
 
+```{r Exploratory Plots}
+#boxplot
+
+
+# htseq then salmon - 
+# boxplot of gene expression of gene x based on counts
+#for mf, 
+#for normal
+
+#Change data frame/matrix to graph from
+box1 = ggplot(data = gene_l2fc_htseqSalmon1_combo, aes(x= L2FC_SALMON, y = L2FC_HTSEQ)) + geom_boxplot()
+box1
+```
 
 
 
-```{r}
+```{r Plotting l2fc prep}
 
 
 ###Extract log2FoldChange columns from htseq and salmon datasets,
@@ -403,7 +417,7 @@ colnames(gene_l2fc_htseqSalmon1_combo) <- c("Gene", "L2FC_HTSEQ","L2FC_SALMON")
 head(gene_l2fc_htseqSalmon1_combo)
 
 ```
-```{r Plotting part 1}
+```{r Plotting l2fc }
 p1 = ggplot(data = gene_l2fc_htseqSalmon1_combo, aes(x= L2FC_SALMON, y = L2FC_HTSEQ)) + geom_point()
 p1
 
@@ -412,7 +426,8 @@ p1
 #numbers are l2fc of mf vs normal gene expression
 
 ```
-```{r Plotting part 2}
+
+```{r Plotting Pvalue prep}
 #resDseqCopy #htseq
 
 #gene_l2fc_htseq1_all <- as.data.frame(resDseqCopy)
@@ -420,7 +435,42 @@ p1
 
 
 #resDseq_salmonCopy #Salmon
+
+
+gene_pvalue_htseq1 <- as.data.frame(resDseqCopy[ ,c(7, 5)])
+
+###Getting rid of rownames (gene list is in new column)
+rownames(gene_pvalue_htseq1) = NULL
+
+###Repeating same process for Salmon as HTSEQ
+gene_pvalue_salmon1 <- as.data.frame(resDseq_salmonCopy[ ,c(7, 5)])
+rownames(gene_pvalue_salmon1) = NULL
+
+###Tests
+head(gene_pvalue_salmon1)
+str(gene_pvalue_htseq1)
+str(gene_pvalue_salmon1)
+
+###Joining two DF's of LF2C by Gene
+gene_pvalue_htseqSalmon1_combo <- full_join(gene_pvalue_htseq1, gene_pvalue_salmon1, by = "Gene")
+
+#Setting Column names
+colnames(gene_pvalue_htseqSalmon1_combo) <- c("Gene", "PVAL_HTSEQ","PVAL_SALMON")
+
+head(gene_pvalue_htseqSalmon1_combo)
+
+
+
+
+
 ```
+
+PVAL Htseq/salmon for diagnosis mf vs. normal
+```{r Plotting Pvalue }
+p2 = ggplot(data = gene_pvalue_htseqSalmon1_combo, aes(x = PVAL_SALMON, y = PVAL_HTSEQ)) + geom_point()
+p2
+```
+
 
 
 
