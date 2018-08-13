@@ -207,8 +207,8 @@ bio_and_tech_summary
 ####HERE DOWN->
 
 
-Optimizing compatability for creating DataSets for DESEQ2 (EDITS = DONE) , !!MAY need to consider separating into two code chunks!!
-```{r Creating matricies / ordering and setting row names and col names}
+Optimizing compatability for creating DataSets for DESEQ2 (EDITS = DONE)
+```{r Optimizing compatability of data for creating DataSets for DESEQ2 - HTSEQ Matrix (part 1)}
 
 #Creats HTSEQ counts matrix
 #Imports everything from HTSEQ Counts dataframe except the first column (Doesn't delete column from original dataframe)
@@ -217,21 +217,24 @@ head(htseqCountsMat)
 
 #Sets rownames of new matrix of HTSEQ count data to gene names in 1st column of original dataframe
 rownames(htseqCountsMat)<- htseq_genecounts_df[,1] 
+```
 
+```{r Optimizing compatability of data for creating DataSets for DESEQ2 - PHENO. Matrix (part 2)}
 #Creates matrix phenoMat from df_combined dataframe
 # Imports all data/columns except molecular ID column (doesnt delete from original dataframe, just doesnt include on import)
 phenoMat = as.matrix(subset(df_combined, select=-molecular_id)); nrow(phenoMat) 
 
 #Sets rownames of phenoMat to data from df_combined  column of molecular ID's
 rownames(phenoMat)<- df_combined$molecular_id
+```
 
+```{r Optimizing compatability of data for creating DataSets for DESEQ2 - ORDER/ALLIGNING (part 3)}
 #Link column names AND column values  of htseqCountsMat to phenoMat row names in same order
 phenoMat <- phenoMat[match(colnames(htseqCountsMat),row.names(phenoMat)),]
 head(phenoMat)
-
 ```
 
-(EDITS = NOT DONE)
+(EDITS = NOT DONE, change variable names)
 ```{r MakeDeseqDataset 1} 
 #DataSet for DESEQ from HTSEQ Matrix created 
 # variable comparing is diagnosis [levels  = mf (myleofibrosis) and normal (no myleofibrosis) ]
@@ -242,7 +245,7 @@ dseqstuff$diagnosis <- relevel(dseqstuff$diagnosis, "normal")
 
 #gets rid of rows of gene counts of 1's and 0's
 dseqstuff <- dseqstuff[ rowSums(counts(dseqstuff)) > 1, ] 
-head(dseqstuff)
+str(dseqstuff)
 ```
 
 ###use Deseqdataset to do analysis using deseq2 tools???
@@ -269,6 +272,7 @@ Gives results of formula:
 resDseqCopy <- results(dseqstuffCopy)
 head(resDseqCopy)
 ```
+
 ```{r DiffGeneAnalysis Design 2}
 ###base lvl = age range
 dseqstuffCopy2 <- dseqstuff
@@ -283,9 +287,6 @@ resDseqCopy2 <- results(dseqstuffCopy2)
 head(resDseqCopy2)
 ###p val dif = low, chance there is a sig. dif.. threshhold = 0.05?
 ```
-
-
-
 
 
 #Repeated processes w/salmon.txt files
@@ -360,13 +361,13 @@ head(resDseq_salmonCopy)
 #for normal
 
 #Change data frame/matrix to graph from
-box1 = ggplot(data = gene_l2fc_htseqSalmon1_combo, aes(x= L2FC_SALMON, y = L2FC_HTSEQ)) + geom_boxplot()
-box1
+#box1 = ggplot(data = gene_l2fc_htseqSalmon1_combo, aes(x= L2FC_SALMON, y = L2FC_HTSEQ)) + geom_boxplot()
+#box1
 ```
 
 
 
-```{r Plotting l2fc prep}
+```{r Plotting l2fc for HTSEQ prep}
 
 
 ###Extract log2FoldChange columns from htseq and salmon datasets,
@@ -389,7 +390,6 @@ box1
 
 ###create new column with values of rownames
 resDseqCopy$Gene <- rownames(resDseqCopy)
-resDseq_salmonCopy$Gene <- rownames(resDseq_salmonCopy)
 
 head(resDseqCopy)
 
@@ -398,15 +398,25 @@ gene_l2fc_htseq1 <- as.data.frame(resDseqCopy[ ,c(7, 2)])
 
 ###Getting rid of rownames (gene list is in new column)
 rownames(gene_l2fc_htseq1) = NULL
-
 ###Repeating same process for Salmon as HTSEQ
+```
+
+```{r Plotting l2fc for Salmon prep}
+resDseq_salmonCopy$Gene <- rownames(resDseq_salmonCopy) #salmon
 gene_l2fc_salmon1 <- as.data.frame(resDseq_salmonCopy[ ,c(7, 2)])
 rownames(gene_l2fc_salmon1) = NULL
 
+```
+
+``` {r Plotting l2fc prep tests}
 ###Tests
-head(gene_l2fc_salmon1)
+head(gene_l2fc_htseq1)
 str(gene_l2fc_htseq1)
+head(gene_l2fc_salmon1)
 str(gene_l2fc_salmon1)
+```
+
+``` {r Plotting l2fc prep - joining/setting}
 
 ###Joining two DF's of LF2C by Gene
 gene_l2fc_htseqSalmon1_combo <- full_join(gene_l2fc_htseq1, gene_l2fc_salmon1, by = "Gene")
@@ -415,9 +425,10 @@ gene_l2fc_htseqSalmon1_combo <- full_join(gene_l2fc_htseq1, gene_l2fc_salmon1, b
 colnames(gene_l2fc_htseqSalmon1_combo) <- c("Gene", "L2FC_HTSEQ","L2FC_SALMON")
 
 head(gene_l2fc_htseqSalmon1_combo)
-
 ```
-```{r Plotting l2fc }
+
+
+```{r Plotting l2fc - part 1 }
 p1 = ggplot(data = gene_l2fc_htseqSalmon1_combo, aes(x= L2FC_SALMON, y = L2FC_HTSEQ)) + geom_point()
 p1
 
@@ -438,7 +449,6 @@ p1
 
 
 gene_pvalue_htseq1 <- as.data.frame(resDseqCopy[ ,c(7, 5)])
-
 ###Getting rid of rownames (gene list is in new column)
 rownames(gene_pvalue_htseq1) = NULL
 
@@ -446,10 +456,14 @@ rownames(gene_pvalue_htseq1) = NULL
 gene_pvalue_salmon1 <- as.data.frame(resDseq_salmonCopy[ ,c(7, 5)])
 rownames(gene_pvalue_salmon1) = NULL
 
+
 ###Tests
-head(gene_pvalue_salmon1)
+head(gene_pvalue_htseq1)
 str(gene_pvalue_htseq1)
+
+head(gene_pvalue_salmon1)
 str(gene_pvalue_salmon1)
+
 
 ###Joining two DF's of LF2C by Gene
 gene_pvalue_htseqSalmon1_combo <- full_join(gene_pvalue_htseq1, gene_pvalue_salmon1, by = "Gene")
@@ -458,10 +472,6 @@ gene_pvalue_htseqSalmon1_combo <- full_join(gene_pvalue_htseq1, gene_pvalue_salm
 colnames(gene_pvalue_htseqSalmon1_combo) <- c("Gene", "PVAL_HTSEQ","PVAL_SALMON")
 
 head(gene_pvalue_htseqSalmon1_combo)
-
-
-
-
 
 ```
 
