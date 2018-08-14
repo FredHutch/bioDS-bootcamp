@@ -1,7 +1,7 @@
 ---
 title: "RNA Sequencing Differential Analysis Project"
 author: "Gavin Fortenberry"
-date: "August 1st, 2018"
+date: "August 14th, 2018"
 output:
   html_document:
     toc: yes
@@ -139,25 +139,25 @@ Binds path's of files(locations of the files in the computer) on the list made t
 The "colnames" function (base R) sets the column names if the newly created dataframe.
 
 ```{r List of htseq files & Path/ID Dataframe, echo=TRUE}
-FileList1 = sapply(RNADirectoryList, 
+FileList_htseq1 = sapply(RNADirectoryList, 
                    function(x){list.files(path = x, 
                                           full.names = TRUE, 
                                           pattern = "htseq.txt") }) 
 
-FileIDList <- as.data.frame(cbind(FileList1, 
+htseq_FileID_df <- as.data.frame(cbind(FileList_htseq1, 
                                   gsub("^.*-","", RNADirectoryList)), 
                             stringsAsFactors = F)
-colnames(FileIDList) <- c("Path", "molecular_id")
-head(FileIDList, n = 3)
+colnames(htseq_FileID_df) <- c("Path", "molecular_id")
+head(htseq_FileID_df, n = 3)
 ```
 Reads all data from list of selected files and compiles into different data frames/list of different data frames using LApply function.
 
 ```{r Creates List of all Dataframes}
-listOf_alldf <- lapply(seq(1:nrow(FileIDList)),
+listOf_alldf <- lapply(seq(1:nrow(htseq_FileID_df)),
                  function(i){ 
-                   X <- read.delim(file = FileIDList$Path[i],
+                   X <- read.delim(file = htseq_FileID_df$Path[i],
                                          header = FALSE);
-                   colnames(X) <- c("Gene", FileIDList$molecular_id[i]);
+                   colnames(X) <- c("Gene", htseq_FileID_df$molecular_id[i]);
                    return(X)
                    } )
 ```
@@ -172,7 +172,9 @@ htseq_genecounts_df <- plyr:: join_all(listOf_alldf, by = NULL,
 head(htseq_genecounts_df, n = 3)
 ```
 
+```{r Salmon DF}
 
+```
 ##Summarizing PHENOTYPES/defining experimental design
 
 ###Biological factors
@@ -217,6 +219,11 @@ head(htseqCountsMat)
 
 #Sets rownames of new matrix of HTSEQ count data to gene names in 1st column of original dataframe
 rownames(htseqCountsMat)<- htseq_genecounts_df[,1] 
+
+
+
+
+#Repeated processes for SALMON
 ```
 
 ```{r Optimizing compatability of data for creating DataSets for DESEQ2 - PHENO. Matrix (part 2)}
@@ -234,18 +241,27 @@ phenoMat <- phenoMat[match(colnames(htseqCountsMat),row.names(phenoMat)),]
 head(phenoMat)
 ```
 
-(EDITS = NOT DONE, change variable names)
-```{r MakeDeseqDataset 1} 
+(EDITS = DONE)
+```{r Make HTSEQ DeseqDataset 1} 
 #DataSet for DESEQ from HTSEQ Matrix created 
 # variable comparing is diagnosis [levels  = mf (myleofibrosis) and normal (no myleofibrosis) ]
-dseqstuff <- DESeqDataSetFromMatrix(htseqCountsMat,phenoMat, design = ~ diagnosis)
+dseq_set_htseq <- DESeqDataSetFromMatrix(htseqCountsMat,phenoMat, design = ~ diagnosis)
 
 # with base level being at "normal" (not myleofibrosis)
-dseqstuff$diagnosis <- relevel(dseqstuff$diagnosis, "normal")
+dseq_set_htseq$diagnosis <- relevel(dseq_set_htseq$diagnosis, "normal")
 
 #gets rid of rows of gene counts of 1's and 0's
-dseqstuff <- dseqstuff[ rowSums(counts(dseqstuff)) > 1, ] 
-str(dseqstuff)
+dseq_set_htseq <- dseq_set_htseq[ rowSums(counts(dseq_set_htseq)) > 1, ] 
+head(dseq_set_htseq)
+```
+
+
+```{r dataset1 gene count plots}
+DESeq2::plotCounts(dseq_set_htseq, "CALR", intgroup = "diagnosis")
+DESeq2::plotCounts(dseq_set_htseq, "JAK2", intgroup = "diagnosis")
+DESeq2::plotCounts(dseq_set_htseq, "A1BG", intgroup = "diagnosis")
+DESeq2::plotCounts(dseq_set_htseq, "ADAMTS7", intgroup = "diagnosis")
+
 ```
 
 ###use Deseqdataset to do analysis using deseq2 tools???
@@ -258,24 +274,24 @@ str(dseqstuff)
 
 ```{r DiffGeneAnalysis Design 1}
 
-#DESeq2::plotCounts(dseqstuff, "CALR", intgroup = "diagnosis")
 
 ###base lvl = diagnosis
-dseqstuffCopy <- dseqstuff
-design(dseqstuffCopy) <- formula(~ diagnosis)
-dseqstuffCopy <- DESeq(dseqstuffCopy)
+#Make copy of htseq data set so original is not modified, multiple formulas can be applied
+dseq_set_htseq_copy <- dseq_set_htseq
+design(dseq_set_htseq_copy) <- formula(~ diagnosis)
+dseq_set_htseq_copy <- DESeq(dseq_set_htseq_copy)
 
 
 ```
 Gives results of formula:
 ```{r Design 1 Results}
-resDseqCopy <- results(dseqstuffCopy)
+resDseqCopy <- results(dseq_set_htseq_copy)
 head(resDseqCopy)
 ```
 
 ```{r DiffGeneAnalysis Design 2}
 ###base lvl = age range
-dseqstuffCopy2 <- dseqstuff
+dseqstuffCopy2 <- dseq_set_htseq
 design(dseqstuffCopy2) <- formula(~ age_range)
 dseqstuffCopy2 <- DESeq(dseqstuffCopy2)
 
@@ -321,27 +337,27 @@ str(salmonCountsMat)
 
 
 
+```{r Creating Salmon Deseq Dataset}
+
+dseq_set_salmon <- DESeqDataSetFromMatrix(salmonCountsMat,phenoMat, design = ~ diagnosis)
+
+
+
+
+dseq_set_salmon$diagnosis <- relevel(dseq_set_salmon$diagnosis, "normal")
+
+dseq_set_salmon <- dseq_set_salmon[ rowSums(counts(dseq_set_salmon)) > 1, ] #gets rid of 1's and 0's
+head(dseq_set_salmon)
+
+```
+
 ```{r }
+dseq_set_salmon_copy <- dseq_set_salmon
+design(dseq_set_salmon_copy ) <- formula(~ diagnosis)
+dseq_set_salmon_copy  <- DESeq(dseq_set_salmon_copy )
 
-dseq_salmon <- DESeqDataSetFromMatrix(salmonCountsMat,phenoMat, design = ~ diagnosis)
-
-
-
-
-dseq_salmon$diagnosis <- relevel(dseq_salmon$diagnosis, "normal")
-
-dseq_salmon <- dseq_salmon[ rowSums(counts(dseq_salmon)) > 1, ] #gets rid of 1's and 0's
-head(dseq_salmon)
-
-
-
-
-dseq_salmonCopy <- dseq_salmon
-design(dseq_salmonCopy ) <- formula(~ diagnosis)
-dseq_salmonCopy  <- DESeq(dseq_salmonCopy )
-
-resDseq_salmonCopy <- results(dseq_salmonCopy)
-head(resDseq_salmonCopy)
+res_dseq_set_salmon_copy <- results(dseq_set_salmon_copy)
+head(res_dseq_set_salmon_copy)
 
 
 
@@ -349,6 +365,7 @@ head(resDseq_salmonCopy)
 
 
 ```
+
 
 
 ```{r Exploratory Plots}
@@ -376,10 +393,10 @@ head(resDseq_salmonCopy)
 
 
 
-###resDseqCopy vs. resDseq_salmonCopy =diagnosis base level = normal
+###resDseqCopy vs. res_dseq_set_salmon_copy =diagnosis base level = normal
 
 ###head(resDseqCopy)
-###head(resDseq_salmonCopy)
+###head(res_dseq_set_salmon_copy)
 
 
 ###convert rownames to column name gene in both df's
@@ -402,8 +419,8 @@ rownames(gene_l2fc_htseq1) = NULL
 ```
 
 ```{r Plotting l2fc for Salmon prep}
-resDseq_salmonCopy$Gene <- rownames(resDseq_salmonCopy) #salmon
-gene_l2fc_salmon1 <- as.data.frame(resDseq_salmonCopy[ ,c(7, 2)])
+res_dseq_set_salmon_copy$Gene <- rownames(res_dseq_set_salmon_copy) #salmon
+gene_l2fc_salmon1 <- as.data.frame(res_dseq_set_salmon_copy[ ,c(7, 2)])
 rownames(gene_l2fc_salmon1) = NULL
 
 ```
@@ -445,7 +462,7 @@ p1
 
 
 
-#resDseq_salmonCopy #Salmon
+#res_dseq_set_salmon_copy #Salmon
 
 
 gene_pvalue_htseq1 <- as.data.frame(resDseqCopy[ ,c(7, 5)])
@@ -453,7 +470,7 @@ gene_pvalue_htseq1 <- as.data.frame(resDseqCopy[ ,c(7, 5)])
 rownames(gene_pvalue_htseq1) = NULL
 
 ###Repeating same process for Salmon as HTSEQ
-gene_pvalue_salmon1 <- as.data.frame(resDseq_salmonCopy[ ,c(7, 5)])
+gene_pvalue_salmon1 <- as.data.frame(res_dseq_set_salmon_copy[ ,c(7, 5)])
 rownames(gene_pvalue_salmon1) = NULL
 
 
@@ -479,7 +496,9 @@ PVAL Htseq/salmon for diagnosis mf vs. normal
 ```{r Plotting Pvalue }
 p2 = ggplot(data = gene_pvalue_htseqSalmon1_combo, aes(x = PVAL_SALMON, y = PVAL_HTSEQ)) + geom_point()
 p2
+#geom_boxplot
 ```
+
 
 
 
