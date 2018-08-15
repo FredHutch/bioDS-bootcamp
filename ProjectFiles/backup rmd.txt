@@ -418,7 +418,6 @@ p2
 box1 = ggplot(data = gene_l2fc_htseqSalmon1_combo, aes(x= L2FC_SALMON, y = L2FC_HTSEQ)) + geom_boxplot()
 box1
 ```
-
 ```{r}
 scatterplot1 = ggplot(data = gene_pvalue_htseqSalmon1_combo, aes(x= PVAL_SALMON, y = PVAL_HTSEQ, color = Gene)) + geom_point(alpha=0.25) + gghighlight(Gene %in% c("A3GALT2", "A1BG") )
 scatterplot1
@@ -433,7 +432,7 @@ scatterplot1
   - find them from summary tables/phenotpe tables
       - (or online_)
 - plot/graph
-```{r Scatter Plot 2}
+```{r Scatter Plot 2, eval=FALSE, include=FALSE}
 #reversed axis
 scatterplot2 = ggplot(data = gene_pvalue_htseqSalmon1_combo, aes(x= PVAL_HTSEQ , y =  PVAL_SALMON, color = Gene)) + geom_point(alpha=0.25) + gghighlight(Gene %in% c("A3GALT2", "A1BG") )
 scatterplot2
@@ -446,7 +445,4 @@ DESeq2::plotCounts(dseq_set_htseq, "CALR", intgroup = "diagnosis")
 #DESeq2::plotCounts(dseq_set_htseq, "JAK2", intgroup = "diagnosis")
 #DESeq2::plotCounts(dseq_set_htseq, "A1BG", intgroup = "diagnosis")
 #DESeq2::plotCounts(dseq_set_htseq, "ADAMTS7", intgroup = "diagnosis")
-#what is MF
-# methods slide
-# flow chart
 ```
