@@ -1,7 +1,7 @@
 ---
 title: "RNA Sequencing Differential Analysis Project"
 author: "Gavin Fortenberry"
-date: "August 14th, 2018"
+date: "August 15th, 2018"
 output:
   pdf_document:
     toc: yes
@@ -26,10 +26,7 @@ The genotype leads to the phenotype.
 
 ### Why is differential gene expression important to a biological question?
 
-
-
 ##How to do differential gene expression:
-
 
 ### What inputs go in:
 24 patients, 12 MF, 12 normal
@@ -37,12 +34,9 @@ The genotype leads to the phenotype.
 
 ### What are the outputs/what is the meaning of the outputs
 
-
-
 ##(My) Experimental Design
 
 ### What groups am I going to compare? (Bio factors vs. tech factors)
-
 
 - The groups of phenotype data being used can be sorted into two overarching categories: biological factors and technical factors.
 Biological factors include "Tissue_type", "genotype_jak2", "genotype_calr", and "genotype_mpl".
@@ -66,9 +60,6 @@ Bioconductor packages need to be installed by "biocLite" rather than install.pac
 install.packages("dplyr")
 install.packages("knitr")
 install.packages("rmarkdown")
-
-
-
 
 ### Install Bioconductor, the DESeq2 Package and ggplot2
 source("https://bioconductor.org/biocLite.R")
@@ -163,13 +154,6 @@ listOf_alldf <- lapply(seq(1:nrow(htseq_FileID_df)),
                    } )
 ```
 
-
-
-
-
-
-
-
 ###SALMON HERE<<<---
 ```{r Reads in salmon count data/make DF}
 ### Reads in data/creates salmon counts dataframe
@@ -182,24 +166,20 @@ salmonCounts_df <-read.csv(file="../RNASeqData/2018-08-06_SalmonGeneLevelCounts.
 ###Biological factors
 ```{r echo=TRUE}
 bio_factors_summary <- df_pheno %>% group_by(diagnosis, genotype_jak2, genotype_calr, age_range, sex) %>% summarise(n())
-bio_factors_summary
+head(bio_factors_summary, n = 3)
 ```
 
 ###Technological factors
 ```{r echo=TRUE}
 tech_factors_summary <- df_pheno %>% group_by(time_to_processing, collection_type, collection_event, extraction_type) %>% summarise(n())
-tech_factors_summary
+head (tech_factors_summary, n = 1)
 ```
 
 ###Bio & tech factors
 ```{r}
 bio_and_tech_summary <- df_pheno %>% group_by(diagnosis, time_to_processing, genotype_jak2, collection_type,  genotype_calr, collection_event, age_range, extraction_type, sex) %>% summarise(n())
-bio_and_tech_summary
+head(bio_and_tech_summary, n = 3)
 ```
-
-
-
-
 ### Create a Summarized Experiment Data set
 ("Summarized Experiment" - something specific to DESeq2 package)
 - Normalize RNA Sequencing Counts - in new normalized data frame
@@ -216,7 +196,7 @@ This produces a dataframe with the molecular ID and Genes in each sample assigne
 ###THIS MATTERS- MOLECULAR ID's LINKED TO THE PHENOTABLE
 htseq_genecounts_df <- plyr:: join_all(listOf_alldf, by = NULL, 
                                  type = "full", match = "all")
-head(htseq_genecounts_df, n = 3)
+head(htseq_genecounts_df, n = 1)
 ```
 
 Optimizing compatability for creating DataSets for DESEQ2 1(EDITS = DONE)
@@ -225,10 +205,10 @@ Optimizing compatability for creating DataSets for DESEQ2 1(EDITS = DONE)
 #Creats HTSEQ counts matrix
 #Imports everything from HTSEQ Counts dataframe except the first column (Doesn't delete column from original dataframe)
 htseqCountsMat = as.matrix(htseq_genecounts_df[,-1]); ncol(htseqCountsMat)          #COLS
-head(htseqCountsMat)
 
 #Sets rownames of new matrix of HTSEQ count data to gene names in 1st column of original dataframe
 rownames(htseqCountsMat)<- htseq_genecounts_df[,1] 
+head(htseqCountsMat, n=1)
 
 
 
@@ -246,8 +226,8 @@ salmonCountsMat <- sapply(salmonCounts_df[ , -25],as.integer)
 #head(salmonCounts_df)
 # Sets rownames of new salmon counts matrix to gene names of salmon counts dataframe
 rownames(salmonCountsMat) <- salmonCounts_genes
-head(salmonCountsMat, n = 4)
-str(salmonCountsMat)
+head(salmonCountsMat, n = 1)
+#str(salmonCountsMat)
 ```
 
 ```{r Optimizing compatability of data for creating DataSets for DESEQ2 - PHENO. Matrix (part 2)}
@@ -262,7 +242,7 @@ rownames(phenoMat)<- df_combined$molecular_id
 ```{r Optimizing compatability of data for creating DataSets for DESEQ2 - ORDER/ALLIGNING (part 3)}
 #Link column names AND column values  of htseqCountsMat to phenoMat row names in same order
 phenoMat <- phenoMat[match(colnames(htseqCountsMat),row.names(phenoMat)),]
-head(phenoMat)
+head(phenoMat, n = 1)
 ```
 ##Creating original DeseqDatasets
 (EDITS = DONE)
@@ -276,33 +256,24 @@ dseq_set_htseq$diagnosis <- relevel(dseq_set_htseq$diagnosis, "normal")
 
 #gets rid of rows of gene counts of 1's and 0's
 dseq_set_htseq <- dseq_set_htseq[ rowSums(counts(dseq_set_htseq)) > 1, ] 
-head(dseq_set_htseq)
 ```
 
 ```{r Creating Salmon Deseq Dataset}
 
 dseq_set_salmon <- DESeqDataSetFromMatrix(salmonCountsMat,phenoMat, design = ~ diagnosis)
 
-
-
-
 dseq_set_salmon$diagnosis <- relevel(dseq_set_salmon$diagnosis, "normal")
 
 dseq_set_salmon <- dseq_set_salmon[ rowSums(counts(dseq_set_salmon)) > 1, ] #gets rid of 1's and 0's
-head(dseq_set_salmon)
-
+#head(dseq_set_salmon)
 ```
 ##Creating copies of original datasets for analysis/design formulas
-```{r Setup of HTSEQDesign 1}
-
-
+```{r Setup of HTSEQDesign 1, message=FALSE, warning=FALSE, include=FALSE}
 ###base lvl = diagnosis
 #Make copy of htseq data set so original is not modified, multiple formulas can be applied
 dseq_set_htseq_copy <- dseq_set_htseq
 design(dseq_set_htseq_copy) <- formula(~ diagnosis)
 dseq_set_htseq_copy <- DESeq(dseq_set_htseq_copy)
-
-
 ```
 
 
@@ -311,8 +282,6 @@ dseq_set_htseq_copy <- DESeq(dseq_set_htseq_copy)
 dseq_set_htseq_copy2 <- dseq_set_htseq
 design(dseq_set_htseq_copy2) <- formula(~ age_range)
 dseq_set_htseq_copy2 <- DESeq(dseq_set_htseq_copy2)
-
-
 ```
 
 
@@ -320,17 +289,10 @@ dseq_set_htseq_copy2 <- DESeq(dseq_set_htseq_copy2)
 dseq_set_salmon_copy <- dseq_set_salmon
 design(dseq_set_salmon_copy ) <- formula(~ diagnosis)
 dseq_set_salmon_copy  <- DESeq(dseq_set_salmon_copy )
-
-
 ```
 
-
-
 # Analysis
-
-
 ###use Deseqdataset to do analysis using deseq2 tools???
-
 ### Following paragraph/description Copied from https://bioconductor.org/packages/release/bioc/vignettes/DESeq2/inst/doc/DESeq2.html#differential-expression-analysis ...IMPORTANT!~!!!!!!!~!~!~!
 
 ###A DESeqDataSet object must have an associated design formula. The design formula expresses the variables which will be used in modeling. The formula should be a tilde (~) followed by the variables with plus signs between them (it will be coerced into an formula if it is not already). The design can be changed later, however then all differential analysis steps should be repeated, as the design formula is used to estimate the dispersions and to estimate the log2 fold changes of the model.
@@ -340,62 +302,34 @@ dseq_set_salmon_copy  <- DESeq(dseq_set_salmon_copy )
 
 Gives results of HTSEQ design formula 1:
 ```{r HTSEQ Design 1 Results}
-resDseqCopy <- results(dseq_set_htseq_copy)
-head(resDseqCopy)
+res_dseq_set_htseq_copy <- results(dseq_set_htseq_copy)
+head(res_dseq_set_htseq_copy, n = 2)
 ```
-
 
 Gives results of HTSEQ design formula 2:
 ```{r Design 2 Results}
-resDseqCopy2 <- results(dseq_set_htseq_copy2)
-head(resDseqCopy2)
+res_dseq_set_htseq_copy2 <- results(dseq_set_htseq_copy2)
+head(res_dseq_set_htseq_copy2, n = 2)
 ###p val dif = low, chance there is a sig. dif.. threshhold = 0.05?
 ```
 
 ``` {r Salmon Design 1 Results}
-
 res_dseq_set_salmon_copy <- results(dseq_set_salmon_copy)
-head(res_dseq_set_salmon_copy)
-
+head(res_dseq_set_salmon_copy, n = 1)
 ```
-
-
-
 # Prep for plotting visual analysis
-
-
-
 ##Log2 fold change
-
 ###HTSEQ
 ```{r Plotting l2fc for HTSEQ prep}
-
-
-###Extract log2FoldChange columns from htseq and salmon datasets,
-###merge into combined DF with genes as rownames, use geom-point to plot in GGplot
-### x= LF2C Salmon, Y= LF2C HTSEQ
-
-
-
-###resDseqCopy vs. res_dseq_set_salmon_copy =diagnosis base level = normal
-
-###head(resDseqCopy)
-###head(res_dseq_set_salmon_copy)
-
-
-###convert rownames to column name gene in both df's
 ###full join by gene
 
-
-###creates two new df's with l2fc data
-
 ###create new column with values of rownames
-resDseqCopy$Gene <- rownames(resDseqCopy)
+res_dseq_set_htseq_copy$Gene <- rownames(res_dseq_set_htseq_copy)
 
-head(resDseqCopy)
+head(res_dseq_set_htseq_copy)
 
 ###Subset/put in a copy of the gene column and logfold2 column from the htseq data into new object/df
-gene_l2fc_htseq1 <- as.data.frame(resDseqCopy[ ,c(7, 2)])
+gene_l2fc_htseq1 <- as.data.frame(res_dseq_set_htseq_copy[ ,c(7, 2)])
 
 ###Getting rid of rownames (gene list is in new column)
 rownames(gene_l2fc_htseq1) = NULL
@@ -407,26 +341,20 @@ rownames(gene_l2fc_htseq1) = NULL
 res_dseq_set_salmon_copy$Gene <- rownames(res_dseq_set_salmon_copy) #salmon
 gene_l2fc_salmon1 <- as.data.frame(res_dseq_set_salmon_copy[ ,c(7, 2)])
 rownames(gene_l2fc_salmon1) = NULL
-
 ```
 ###Tests
 ``` {r Plotting l2fc prep tests}
 ###Tests
-head(gene_l2fc_htseq1)
-str(gene_l2fc_htseq1)
-head(gene_l2fc_salmon1)
-str(gene_l2fc_salmon1)
+head(gene_l2fc_htseq1, n = 1) #gene_l2fc_salmon1
+str(gene_l2fc_htseq1) #gene_l2fc_salmon1
 ```
 ###HTSEQ & Salmon
 ``` {r Plotting l2fc prep - joining/setting}
-
 ###Joining two DF's of LF2C by Gene
 gene_l2fc_htseqSalmon1_combo <- full_join(gene_l2fc_htseq1, gene_l2fc_salmon1, by = "Gene")
-
 #Setting Column names
 colnames(gene_l2fc_htseqSalmon1_combo) <- c("Gene", "L2FC_HTSEQ","L2FC_SALMON")
-
-head(gene_l2fc_htseqSalmon1_combo)
+head(gene_l2fc_htseqSalmon1_combo, n = 2)
 ```
 
 ##P-value
@@ -434,21 +362,17 @@ head(gene_l2fc_htseqSalmon1_combo)
 
 
 ```{r Plotting Pvalue prep htseq}
-#resDseqCopy #htseq
+#res_dseq_set_htseq_copy #htseq
 
-#gene_l2fc_htseq1_all <- as.data.frame(resDseqCopy)
-
-
+#gene_l2fc_htseq1_all <- as.data.frame(res_dseq_set_htseq_copy)
 
 #res_dseq_set_salmon_copy #Salmon
 
-
-gene_pvalue_htseq1 <- as.data.frame(resDseqCopy[ ,c(7, 5)])
+gene_pvalue_htseq1 <- as.data.frame(res_dseq_set_htseq_copy[ ,c(7, 5)])
 ###Getting rid of rownames (gene list is in new column)
 rownames(gene_pvalue_htseq1) = NULL
 ```
 ###Salmon
-
 ```{r Plotting Pvalue prep salmon}
 ###Repeating same process for Salmon as HTSEQ
 gene_pvalue_salmon1 <- as.data.frame(res_dseq_set_salmon_copy[ ,c(7, 5)])
@@ -458,41 +382,24 @@ rownames(gene_pvalue_salmon1) = NULL
 
 ```{r Plotting Pvalue prep Tests}
 ###Tests
-head(gene_pvalue_htseq1)
-str(gene_pvalue_htseq1)
-
-head(gene_pvalue_salmon1)
-str(gene_pvalue_salmon1)
+head(gene_pvalue_htseq1, n = 2) #head(gene_pvalue_salmon1)
+str(gene_pvalue_htseq1) # str(gene_pvalue_salmon1)
 ```
 ###HTSEQ & Salmon
 ```{r Plotting Pvalue prep HTSEQ/SALMON combo}
-
 ###Joining two DF's of LF2C by Gene
 gene_pvalue_htseqSalmon1_combo <- full_join(gene_pvalue_htseq1, gene_pvalue_salmon1, by = "Gene")
-
 #Setting Column names
 colnames(gene_pvalue_htseqSalmon1_combo) <- c("Gene", "PVAL_HTSEQ","PVAL_SALMON")
-
-head(gene_pvalue_htseqSalmon1_combo)
-
+head(gene_pvalue_htseqSalmon1_combo, n = 2)
 ```
-
-
-
 # Visualizing analysis/plotting
-
 ##Log2 Fold Change and PVAL Plots
 ```{r Plotting l2fc - part 1 }
 p1 = ggplot(data = gene_l2fc_htseqSalmon1_combo, aes(x= L2FC_SALMON, y = L2FC_HTSEQ)) + geom_point()
 p1
-
-#EXPLAIN WHAT L2FC IS
-#each dot corresponds to 2 logfoldchanges for one gene
-#numbers are l2fc of mf vs normal gene expression
-
+#EXPLAIN WHAT L2FC IS, #each dot corresponds to 2 logfoldchanges for one gene, #numbers are l2fc of mf vs normal gene expression
 ```
-
-
 PVAL Htseq/salmon for diagnosis mf vs. normal
 ```{r Plotting Pvalue }
 p2 = ggplot(data = gene_pvalue_htseqSalmon1_combo, aes(x = PVAL_SALMON, y = PVAL_HTSEQ)) + geom_point()
@@ -502,14 +409,7 @@ p2
 ##Box Plots
 ```{r Box Plot 1}
 #boxplot
-
-
-# htseq then salmon - 
-# boxplot of gene expression of gene x based on counts
-#for mf, 
-#for normal
-
-#Change data frame/matrix to graph from
+# htseq then salmon -  # boxplot of gene expression of gene x based on counts #for mf, #for normal #Change data frame/matrix to graph from
 box1 = ggplot(data = gene_l2fc_htseqSalmon1_combo, aes(x= L2FC_SALMON, y = L2FC_HTSEQ)) + geom_boxplot()
 box1
 ```
@@ -519,23 +419,11 @@ box1
 #box2 = ggplot(data = gene_pvalue_htseqSalmon1_combo, aes(x= PVAL_HTSEQ, y = PVAL_SALMON)) + geom_boxplot()
 #box2
 ```
-
-
-
-
-
-
 ##Exploratory plots
 ###Exploratory plot1
-
 ```{r dataset1 gene count plots}
 DESeq2::plotCounts(dseq_set_htseq, "CALR", intgroup = "diagnosis")
-DESeq2::plotCounts(dseq_set_htseq, "JAK2", intgroup = "diagnosis")
-DESeq2::plotCounts(dseq_set_htseq, "A1BG", intgroup = "diagnosis")
-DESeq2::plotCounts(dseq_set_htseq, "ADAMTS7", intgroup = "diagnosis")
-
+#DESeq2::plotCounts(dseq_set_htseq, "JAK2", intgroup = "diagnosis")
+#DESeq2::plotCounts(dseq_set_htseq, "A1BG", intgroup = "diagnosis")
+#DESeq2::plotCounts(dseq_set_htseq, "ADAMTS7", intgroup = "diagnosis")
 ```
-
-
-
-
