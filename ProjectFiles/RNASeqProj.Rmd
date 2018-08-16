@@ -60,7 +60,7 @@ Bioconductor packages need to be installed by "biocLite" rather than install.pac
 install.packages("dplyr")
 install.packages("knitr")
 install.packages("rmarkdown")
-
+install.packages("corrplot")
 ### Install Bioconductor, the DESeq2 Package and ggplot2
 source("https://bioconductor.org/biocLite.R")
 biocLite("DESeq2")
@@ -71,7 +71,7 @@ install.packages("ggplot2")
 ```{r Load Additional Libraries, eval=TRUE, message=FALSE, warning=FALSE, include=TRUE}
 library(DESeq2); library(ggplot2)
 library(plyr); library(dplyr)
-library(gghighlight)
+library(gghighlight); library(corrplot)
 ```
 
 ### Read in Project Metadata to R
@@ -450,3 +450,8 @@ DESeq2::plotCounts(dseq_set_htseq, "CALR", intgroup = "diagnosis")
 # methods slide
 # flow chart
 ```
+
+```{r}
+#corrplot(, method = "color")
+```
+
