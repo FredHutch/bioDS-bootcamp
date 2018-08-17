@@ -483,8 +483,25 @@ df_htseqNsalmonLong <- full_join(htseq_genecounts_dfLong, salmon_genecounts_dfLo
 
 
 df_htseqNsalmonLong$counts.y <- as.integer(df_htseqNsalmonLong$counts.y)
+colnames(df_htseqNsalmonLong) <- c("Gene", "molec_ID", "htseq_counts", "salmon_counts") #lowkey sketch process, invesitage later
+
 df_htseqNsalmonLong
 
+
 #summary tables from this, use sum tables in hand drawn vennD
+venn_summary <- summarize(df_htseqNsalmonLong, 
+                          HTonly = sum((!is.na(htseq_counts)) & (is.na(salmon_counts))),
+                          Salmononly = sum((is.na(htseq_counts)) & (!is.na(salmon_counts))),
+                          Both = sum((!is.na(htseq_counts)) & (!is.na(salmon_counts))),
+                          Neither = sum((is.na(htseq_counts)) & (is.na(salmon_counts))))
+```
+
+```{r Check of summary validity}
+#QuickMathSlol
+venn_summary$total=sum(venn_summary[1,1:4])
+#Creates new column                   Asks if 'total' column = number of rows of original DF
+venn_summary$is_same_as_num_of_rows_of_df <- venn_summary[1,5] == ( nrow(df_htseqNsalmonLong) )
+print(venn_summary[1,6])
+venn_summary$is_same_as_num_of_rows <- NULL
 ```
 
