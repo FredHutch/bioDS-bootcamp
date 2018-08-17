@@ -61,6 +61,8 @@ install.packages("dplyr")
 install.packages("knitr")
 install.packages("rmarkdown")
 install.packages("corrplot")
+install.packages("tidyr")
+install.packages("tibble")
 ### Install Bioconductor, the DESeq2 Package and ggplot2
 source("https://bioconductor.org/biocLite.R")
 biocLite("DESeq2")
@@ -70,8 +72,11 @@ install.packages("ggplot2")
 ### Load Additional Packages
 ```{r Load Additional Libraries, eval=TRUE, message=FALSE, warning=FALSE, include=TRUE}
 library(DESeq2); library(ggplot2)
-library(plyr); library(dplyr)
-library(gghighlight); library(corrplot)
+library(plyr); library(corrplot)
+library(tidyr); library(dplyr)
+library(gghighlight); 
+library(tibble)
+
 ```
 
 ### Read in Project Metadata to R
@@ -451,7 +456,35 @@ DESeq2::plotCounts(dseq_set_htseq, "CALR", intgroup = "diagnosis")
 # flow chart
 ```
 
-```{r}
+```{r eval=FALSE, include=FALSE}
 #corrplot(, method = "color")
+#head(df_htseqNsalmon)
+
+#tidyr gather
+
+#1
+htseq_genecounts_dfLong <- tidyr::gather(htseq_genecounts_df, "molec_ID", "counts", -Gene)
+htseq_genecounts_dfLong
+
+#2
+
+salmonCounts_df_int <- cbind(salmonCounts_df[ , -25], salmonCounts_genes) # (dont need add column at beginning)
+head(salmonCounts_df_int)
+str(salmonCounts_df_int)
+
+
+#2
+salmon_genecounts_dfLong <- gather(salmonCounts_df_int, "molec_ID", "counts", -salmonCounts_genes)
+colnames(salmon_genecounts_dfLong) <- c("Gene", "molec_ID", "counts") #lowkey sketch process, invesitage later
+salmon_genecounts_dfLong
+
+#3
+df_htseqNsalmonLong <- full_join(htseq_genecounts_dfLong, salmon_genecounts_dfLong, by = c("Gene", "molec_ID") )
+
+
+df_htseqNsalmonLong$counts.y <- as.integer(df_htseqNsalmonLong$counts.y)
+df_htseqNsalmonLong
+
+#summary tables from this, use sum tables in hand drawn vennD
 ```
 
