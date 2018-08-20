@@ -315,7 +315,8 @@ Gives results of HTSEQ design formula 2:
 ```{r Design 2 Results}
 res_dseq_set_htseq_copy2 <- results(dseq_set_htseq_copy2)
 head(res_dseq_set_htseq_copy2, n = 2)
-###p val dif = low, chance there is a sig. dif.. threshhold = 0.05?
+###p val dif = low, chance there is a sig. dif.. threshhold = 0.05?  
+#use alpha = 0.05 to see if the number of genes in the list of differentially expressed genes is smaller than when alpha = 0.1.
 ```
 
 ``` {r Salmon Design 1 Results}
@@ -404,6 +405,7 @@ head(gene_pvalue_htseqSalmon1_combo, n = 2)
 p1 = ggplot(data = gene_l2fc_htseqSalmon1_combo, aes(x= L2FC_SALMON, y = L2FC_HTSEQ)) + geom_point()
 p1
 #EXPLAIN WHAT L2FC IS, #each dot corresponds to 2 logfoldchanges for one gene, #numbers are l2fc of mf vs normal gene expression
+ggsave("p1_graph_finnesse.jpeg", plot = last_plot(), device = "png")
 ```
 PVAL Htseq/salmon for diagnosis mf vs. normal
 ```{r Plotting Pvalue }
@@ -456,7 +458,7 @@ DESeq2::plotCounts(dseq_set_htseq, "CALR", intgroup = "diagnosis")
 # flow chart
 ```
 
-```{r eval=FALSE, include=FALSE}
+```{r}
 #corrplot(, method = "color")
 #head(df_htseqNsalmon)
 
@@ -490,18 +492,54 @@ df_htseqNsalmonLong
 
 #summary tables from this, use sum tables in hand drawn vennD
 venn_summary <- summarize(df_htseqNsalmonLong, 
-                          HTonly = sum((!is.na(htseq_counts)) & (is.na(salmon_counts))),
-                          Salmononly = sum((is.na(htseq_counts)) & (!is.na(salmon_counts))),
-                          Both = sum((!is.na(htseq_counts)) & (!is.na(salmon_counts))),
-                          Neither = sum((is.na(htseq_counts)) & (is.na(salmon_counts))))
+                          HTSeq_only = sum((!is.na(htseq_counts)) & (is.na(salmon_counts))),
+                          Salmon_only = sum((is.na(htseq_counts)) & (!is.na(salmon_counts))),
+                          Both = sum((!is.na(htseq_counts)) & (!is.na(salmon_counts))))
+                          #Neither = sum((is.na(htseq_counts)) & (is.na(salmon_counts))))
+venn_summary
 ```
 
 ```{r Check of summary validity}
 #QuickMathSlol
-venn_summary$total=sum(venn_summary[1,1:4])
+venn_summary$total=sum(venn_summary[1,1:3])
 #Creates new column                   Asks if 'total' column = number of rows of original DF
-venn_summary$is_same_as_num_of_rows_of_df <- venn_summary[1,5] == ( nrow(df_htseqNsalmonLong) )
-print(venn_summary[1,6])
+venn_summary$is_same_as_num_of_rows_of_df <- venn_summary[1,4] == ( nrow(df_htseqNsalmonLong) )
+print(venn_summary[1,5])
 venn_summary$is_same_as_num_of_rows <- NULL
 ```
 
+```{r }
+venn_summary_mat <- as.matrix(venn_summary)
+barplot(venn_summary_mat, main = "Summary of 'HTSEQ' vs. 'SALMON' Gene Counts", xlab = "Tool", ylab = "Counts", col="red")
+##figure out how to change y axis
+
+```
+
+```{r }
+L2FC_SUM1 <- summarize(gene_l2fc_htseqSalmon1_combo, 
+                          HTSeq_L2FC_only = sum((!is.na(L2FC_HTSEQ)) & (is.na(L2FC_SALMON))),
+                          SalmonL2FConly = sum((is.na(L2FC_HTSEQ)) & (!is.na(L2FC_SALMON))),
+                          Both_L2FC = sum((!is.na(L2FC_HTSEQ)) & (!is.na(L2FC_SALMON))))
+                          #Neither_L2FC = sum((is.na(L2FC_HTSEQ)) & (is.na(L2FC_SALMON))))
+L2FC_SUM1
+
+L2FC_SUM1_mat <- as.matrix(L2FC_SUM1)
+barplot(L2FC_SUM1_mat, main = "Summary of 'HTSEQ' vs. 'SALMON' L2FC", xlab = "Tool", ylab = "Number of Genes", col="blue")
+
+
+```
+```
+
+##Comments
+figure out how to change y axis
+The way that tools model how biology work could impact gene connections
+ One tool will impact how you choose to extend your research
+If overestimating of one tool happens 
+Use second bioinformatic tool to narrow down results you get to more likely whats real to focus more without a bunch of crazy experiments
+
+```{r }
+
+
+
+
+```
