@@ -1,4 +1,0 @@
-- each tools have differentbiases
-- certain genes one gene might be able to identify the counts more accurately
-- l2fc htseq vs. salmon l2fc 
-- bias = anything tool does that isnt completely accurate
