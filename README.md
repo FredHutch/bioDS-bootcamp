@@ -1,31 +1,16 @@
 # bioDS-bootcamp
-A repo for new interns learning the basics of biomedical data science
+A repo for new interns learning the basics of biomedical data science at the Fred Hutch.
 
-## Annotation Definitions
-To see the current definitions of the annotations included alongside the datasets in this repo, please visit this link and [click on the "TGDCC" tab.](https://translationalgenomics.shinyapps.io/FHOntologyBrowser/)
+## Reference Information
+### Repository Structure
+#### Biomedical Datasets
+This folder contains real datasets for projects associated with this repository.  Each dataset is in a subfolder with a README.md explaining the unique information about that dataset such as the data source, type and associated annotations.
 
+#### Tutorials
+This folder contains tutorials and links to information about specific data literacy topics such as Tidy Data, or Data Visualization.  
 
-## Web-Based Tutorials
-- Introduction to GitHub
-  - FH Wiki introduction [here](http://sciwiki.fredhutch.org/compdemos/comp_github/)
-  - YouTube GitHub Guides [here](https://www.youtube.com/githubguides)
-  - Getting started with [GitHub](https://www.youtube.com/watch?v=noZnOSpcjYY&list=PLg7s6cbtAD15G8lNyoaYDuKZSKyJrgwB-)
-  - The [Basics](https://www.youtube.com/watch?v=8oRjP8yj2Wo&list=PLg7s6cbtAD165JTRsXh8ofwRw0PqUnkVH)
-- Introduction to R: https://www.datacamp.com/courses/free-introduction-to-r
-- Importing Data (first section): https://www.datacamp.com/courses/importing-data-in-r-part-1
-- Cleaning Data (first section):  https://www.datacamp.com/courses/cleaning-data-in-r
-- Introduction to the Tidyverse: https://www.datacamp.com/courses/introduction-to-the-tidyverse
-- Visualization with ggplot2: https://www.datacamp.com/courses/data-visualization-with-ggplot2-1
+#### Your Content Here
+Once you fork this repository, you can create a folder in your fork to contain all of your project documentation alongside the Datasets and Tutorials.  This will allow you to update from this repository as new information or datasets comes in, without impacting your project work.
 
-
-## Additional Data Cleaning/ Data Wrangling Tutorials
-- Students will need to have an open RStudio Session  (http://rstudio.fhcrc.org/) to complete the non-interactive tutorials
-http://www.datacarpentry.org/R-genomics/    
-  - Data for Tutorial:
-  - https://github.com/datacarpentry/R-genomics/
-  - https://www.datacamp.com/courses/string-manipulation-in-r-with-stringr
-  - http://stat545.com/block022_regular-expression.html (I have the data downloaded for this)
-
-## Biomedical Data Sets
-1. Gene expression data from RNA sequencing
-2. Genomic variants list and annotations from DNA sequencing
+### Fred Hutch Ontology Definitions
+To see the current definitions of the annotations included alongside the genomic datasets in this repo, please visit this link and [click on the "Translational Genomics Repository" tab.](https://ontology.fredhutch.org/)
