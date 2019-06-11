@@ -60,5 +60,3 @@ it may also be possible to install these programs through the self-service app.
 ### R/Rstudio
 
 ### Bioconductor
-
-## Web-Based Tutorials
