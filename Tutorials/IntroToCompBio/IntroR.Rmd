@@ -5,6 +5,7 @@ output: html_document
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
+library(tidyverse)
 ```
 
 ## How does R work?
@@ -61,4 +62,41 @@ weight_kg <- 57.5
 # create new object from operation
 weight_lb <- 2.2 * weight_kg
 weight_kg <- 100
+```
+
+## Tidyverse
+
+Tidyverse is the name of a set of packages (software) that allow us to do extra cool stuff with data in R.
+
+```{r tidyverse, eval=FALSE}
+# install tidyverse
+install.packages("tidyverse")
+# load package
+library(tidyverse)
+```
+
+## Data visualization
+
+```{r}
+# access data (available with packages)
+data(mtcars)
+head(df)
+?mtcars
+```
+
+```{r}
+# scatterplot of miles per gallon and weight
+qplot(mpg, wt, data=mtcars)
+```
+
+```{r}
+# color points by number of cylinders, add smoothing lines
+qplot(mpg, wt, data = mtcars, color = factor(cyl),
+      geom=c("point", "smooth"))
+```
+
+```{r}
+# boxplot of mpg by transmission
+qplot(factor(am), mpg, data = mtcars,
+      geom="boxplot")
 ```
