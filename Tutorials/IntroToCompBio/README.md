@@ -1,4 +1,5 @@
-# Tools of the Trade
+# Introduction to Computational Biology
+
 These are the basic tools you'll need to learn to use the information in this repository, work with data and convey your results.  We have primarily focused on using R for this bootcamp for a variety of reasons but know that other programming languages (such as python) are also commonly used in biomedical data science.
 
 ## Software installation
