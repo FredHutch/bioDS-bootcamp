@@ -1,0 +1,64 @@
+---
+title: "Intro to R"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## How does R work?
+
+R is a statistical programming language. This means that we can write code in R that a computer reads and interprets to perform specific tasks.
+
+We'll be using RStudio as our way to interact with R code. The panel labeled `Console` is where we submit code to R and read the output. 
+
+Click on the icon in the upper left window of RStudio of a white square with a green plus sign, then select `R Script`. This will open a new panel for typing text. Save this file someplace on your computer you'll be able to find it later, and call it `Practice.R`. 
+
+Try typing the following basic math in the text window. You can send this line of code to the console for R to run by holding down the `Control` key and pressing `Return`. 
+
+```{r math}
+3 + 3 
+```
+In the example above, the code entered appears in the gray box, and the result appears below it.
+
+We can include notes to ourselves that describe what the code does by adding a hash sign (or pound sign, or hash tag) in front of the notes on the same line. This is called commenting code:
+
+```{r comment}
+# this is a code comment, which is useful for describing the purpose of the code that follows
+
+# performing basic math
+3 + 3 
+3 + 4 # you can include comments on the same line as code
+3+4 # spaces on either side of the plus sign aren't necessary, but it makes your code easier to read
+```
+
+## Using functions
+
+```{r functions}
+# functions are used to perform specific tasks
+
+
+# round a number
+round(3.1415)
+
+# change the number of decimal places
+round(3.1415, digits = 2)
+
+```
+
+## Assigning objects
+
+```{r}
+# assigning value to an object
+weight_kg <- 55 # <- is an assignment operator
+# recall object
+weight_kg
+# perform an operation on an object
+2.2 * weight_kg
+# assign a new value to object
+weight_kg <- 57.5
+# create new object from operation
+weight_lb <- 2.2 * weight_kg
+weight_kg <- 100
+```
