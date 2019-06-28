@@ -1,6 +1,6 @@
-#### Gene expression analysis of myleofibrosis ####
+#### Software installation ####
 
-# Notes on using RStudio:
+# Notes on using an R script in RStudio:
 #   Any lines starting with # are not code; these are notes for humans and R ignores them
 #   Hold down the Control key and press enter to execute (run) the line or chunk of code where the cursor is located
 
@@ -13,7 +13,7 @@ install.packages("tidyverse")
 if (!requireNamespace("BiocManager", quietly = TRUE))
   install.packages("BiocManager")
 BiocManager::install("DESeq2")
-# if you reveice the following prompts:
+# if you are given the following prompts:
 #   "Update all/some/none", type a (for all) and hit Enter
 #   "Do you want to install from sources the package which needs compilation? (Yes/no/cancel)" hit Enter 
 

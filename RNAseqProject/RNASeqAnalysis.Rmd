@@ -1,0 +1,37 @@
+---
+title: "RNAseq analysis"
+output: html_notebook
+---
+
+# Instructions for using a notebook 
+
+This is an [R Markdown](http://rmarkdown.rstudio.com) Notebook. Execute a code chunk by clicking the *Run* button within the chunk or by placing your cursor inside it and pressing *Cmd+Shift+Enter*. The results will appear beneath the code. Add a new chunk by clicking the *Insert Chunk* button on the toolbar or by pressing *Cmd+Option+I*.
+
+```{r example plot}
+# create plot 
+plot(cars)
+```
+
+# Install and load software 
+
+If you do not already have Tidyverse and DESeq2 installed, this code will perform the task for you. You may be asked the following questions:
+
+* "Update all/some/none"? type a (for all) and hit Enter
+* "Do you want to install from sources the package which needs compilation? (Yes/no/cancel)" hit Enter 
+
+```{r include=FALSE}
+# install tools for data manipulation and plotting
+install.packages("tidyverse")
+
+# install tools for genomic analysis
+if (!requireNamespace("BiocManager", quietly = TRUE))
+  install.packages("BiocManager")
+BiocManager::install("DESeq2")
+
+# load packages
+library(tidyverse)
+library(DESeq2)
+```
+
+Note that you will need to *install* a package only once per computer, but you'll need to *load* the packages every time you reopen RStudio.
+
