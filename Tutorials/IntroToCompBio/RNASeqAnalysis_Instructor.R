@@ -22,3 +22,7 @@ BiocManager::install("DESeq2")
 # load packages
 library(tidyverse)
 library(DESeq2)
+
+#### Examine phenotypes ####
+
+read.csv("Data/phenotypeTable.csv")
