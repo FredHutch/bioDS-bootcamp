@@ -2,15 +2,16 @@
 
 Where to start?
 
-## Tools of the Trade
+## IntroToCompBio
 
-To use this repository and begin working with data there are a couple of tools you'll need to learn first.  
+This is an introduction to computational biology, including the following topics: 
 - GitHub and GitHub Desktop
 - R and Rstudio
   - Writing code in R
   - Basic data types (character, integer, numeric, logical, factors)
   - Introduction to R packages from CRAN and Bioconductor
   - Using a Notebook
+  - RNAseq analysis
 
 ## Tidy Data, Data Structures and Data Quality
 
