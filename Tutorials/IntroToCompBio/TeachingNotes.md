@@ -26,15 +26,27 @@ Link to slides:
 ## Introduction to R and RStudio
 
 * [Using RStudio and setting up projects](using RStudio and setting up projects: https://datacarpentry.org/R-ecology-lesson/00-before-we-start.html)
-* See notes in `IntroR.html` for the basic R materials you should cover in this section
+* See notes in `Tutorials/IntroToCompBio/IntroR.html` for the basic R materials you should cover in this section
+* Save practice materials in script called `Practice.R`
+* If extra time, use `mtcars` and `qplot` (will need to import tidyverse) with [this tutorial](http://www.sthda.com/english/wiki/qplot-quick-plot-with-ggplot2-r-software-and-data-visualization)
 
 ## Introduction to RNAseq analysis (slides)
 
+* [myelofibrosis background](https://ghr.nlm.nih.gov/condition/primary-myelofibrosis)
 
 ## Introduction to GitHub
 
+* Sign up for GitHub account: use reasonable login name!
+* Overview of GitHub interface
+* Overview of GitHub Desktop App
+* Use Desktop App to clone this repository
 
 ## Setting up our projects
 
+* Open RNAseqProject through RStudio
+* explain projects
+* move practice script here
 
 ## RNAseq analysis
+
+* Talk through script, emphasizing thought process
