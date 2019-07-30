@@ -142,21 +142,21 @@ Now we need to read in the processed results from our RNA sequencing data analys
 
 Each sample has data in a different subfolder in "../Datasets/RNASeqData", but each file we want has "htseq.txt" on the end of the file name.  Here we are going to go find a list of those files, and then next read each of them into R and store them as a list of data frames.  After we name each data frame in this list, we will merge them all into one large data frame. We provide an example of saving this resulting counts table in the repo and reading it back in for convenience for your later work.   
 ```{r}
-htseqFiles <- list.files(path = "../Datasets/RNASeqData", # the path to where the data are saved
+seqFiles <- list.files(path = "../Datasets/RNASeqData", # the path to where the data are saved
                         recursive = TRUE, # look inside directories that are in the path above
                         pattern = "htseq.txt", # only return results that have filenames that include this string
                         full.names = TRUE) # give back the full path/names so we can find where they are!
 
-htseqNames <- gsub("-R....-.*", "", gsub("../Datasets/RNASeqData/", "", htseqFiles)) # extracting the sample name from the path!
+seqNames <- gsub("-R....-.*", "", gsub("../Datasets/RNASeqData/", "", seqFiles)) # extracting the sample name from the path!
 
-dataList <- lapply(htseqFiles, function(x) {
+dataList <- lapply(seqFiles, function(x) {
   Y <- read.delim(file = x,
              header = FALSE,
              sep = "\t");
   colnames(Y) <- c("Gene", "Count")
   Y
 })
-names(dataList) <- htseqNames
+names(dataList) <- seqNames
 
 studyData <- purrr::map_dfr(dataList, cbind, .id = "omics_sample_name")
 
@@ -211,9 +211,9 @@ nrow(countsMatrix) # How many rows are there?  Should be one row for each gene (
 ### Create a phenotype Matrix
 Imports all data/columns except
 ```{r}
-phenoMatrix <-  as.matrix(studyMetadata); nrow(phenoMat) 
-#Sets rownames of phenoMat to data from df_combined  column of molecular ID's
-rownames(phenoMat) <- as.character(studyMetadata$omics_sample_name)
+phenoMatrix <-  as.matrix(studyMetadata); nrow(phenoMatrix) 
+#Sets rownames of phenoMatrix to same names as countsMatrix columns
+rownames(phenoMatrix) <- as.character(studyMetadata$omics_sample_name)
 ```
 
 ### Create a `Summarized Experiment` Data set
