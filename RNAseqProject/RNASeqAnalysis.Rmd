@@ -10,7 +10,7 @@ output:
 
 This is an [R Markdown](http://rmarkdown.rstudio.com) Notebook. Execute a code chunk by clicking the *Run* button within the chunk or by placing your cursor inside it and pressing *Cmd+Shift+Enter*. The results will appear beneath the code. Add a new chunk by clicking the *Insert Chunk* button on the toolbar or by pressing *Cmd+Option+I*.
 
-```{r example plot, eval=FALSE, include=FALSE}
+```{r example plot, echo=FALSE}
 # create plot 
 plot(cars)
 ```
@@ -197,12 +197,58 @@ min(readCounts)
 
 ## Creating Analysis Ready Data
 Next you will need to create an analysis-ready dataset ready for analysis via DESeq2 in order to get differential gene expression results. 
+
+### Create a counts Matrix
+
 ```{r}
+countsMatrix <- as.matrix(studyCountsTable[,-1])
+rownames(countsMatrix) <- studyCountsTable[,1]
 
+ncol(countsMatrix)  # How many columns are there?  Should be one column for each sample.
+nrow(countsMatrix) # How many rows are there?  Should be one row for each gene (about 26,000 for humans)
 
+```
+### Create a phenotype Matrix
+Imports all data/columns except
+```{r}
+phenoMatrix <-  as.matrix(studyMetadata); nrow(phenoMat) 
+#Sets rownames of phenoMat to data from df_combined  column of molecular ID's
+rownames(phenoMat) <- as.character(studyMetadata$omics_sample_name)
+```
 
+### Create a `Summarized Experiment` Data set
+A DESeqDataSet object must have an associated design formula. The design formula expresses the variables which will be used in modeling. The formula should be a tilde (~) followed by the variables with plus signs between them (it will be coerced into an formula if it is not already). The design can be changed later, however then all differential analysis steps should be repeated, as the design formula is used to estimate the dispersions and to estimate the log2 fold changes of the model.
+```{r} 
+dseqDataSet<- DESeqDataSetFromMatrix(countsMatrix, phenoMatrix, design = ~ diagnosis)
+
+dseqDataSet$diagnosis <- relevel(dseqDataSet$diagnosis, "normal") # make the "control" level be "normal" (not myleofibrosis)
+
+dseqDataSet <- dseqDataSet[ rowSums(counts(dseqDataSet)) > 1, ] # filter out rows of gene counts of 1's and 0's that will not be useful data in the future
 ```
 
 
+`dseqDataSet` is now your "analysis ready" dataset for the DESeq2 package. 
 
+# Differential Gene Expression Analysis
+Read more here:
+https://bioconductor.org/packages/release/bioc/vignettes/DESeq2/inst/doc/DESeq2.html#differential-expression-analysis 
+
+Gives results of of the differential expression analysis with the current design formula.
+
+```{r}
+dseqAnalysis  <- DESeq(dseqDataSet)
+dseqDataResults<- results(dseqAnalysis)
+head(dseqDataResults, n = 2)
+```
+
+## Save results as a csv file for use outside of R
+```{r}
+dfResults <- data.frame(dseqDataResults)
+write.csv(dfResults, 
+          file = "Results/differentialGeneExpressionResults.csv", 
+          row.names = F, quote = F)
+```
+
+
+# Data Visuzalization
 
